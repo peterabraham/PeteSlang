@@ -17,10 +17,45 @@ Expression::~Expression() {
 
 
 /*
+ * Ctor of the class NumericConstant
+ */
+NumericConstant::NumericConstant(const double value_i): myValue(value_i) {
+}
+
+
+/*
+ * Dtor of the class NumericConstant
+ */
+NumericConstant::~NumericConstant() {
+}
+
+
+/*
  * Function to evaluate a numeric constant
  */
 double NumericConstant::evaluate(const RuntimeContext* context_i) {
     return myValue;
+}
+
+
+/*
+ * Ctor of the class BinaryExpression
+ */
+BinaryExpression::BinaryExpression(Expression* pEx1_i,
+                                   Expression* pEx2_i,
+                                   const Operator optr_i) : pmyExp1(pEx1_i),
+                                                            pmyExp2(pEx2_i),
+                                                            myOptr(optr_i)
+{
+}
+
+
+/*
+ * Dtor of the class BinaryExpression
+ */
+BinaryExpression::~BinaryExpression() {
+    SafeDelete(pmyExp1);
+    SafeDelete(pmyExp2);
 }
 
 
@@ -50,6 +85,24 @@ double BinaryExpression::evaluate(const RuntimeContext* context_i) {
     }
     
     return NAN;
+}
+
+
+/*
+ * Ctor of the class UnaryExpression
+ */
+UnaryExpression::UnaryExpression(Expression* pEx_i,
+                                 const Operator optr_i): pmyExp(pEx_i),
+                                                         myOptr(optr_i)
+{
+}
+
+
+/*
+ * Dtor of the class UnaryExpression
+ */
+UnaryExpression::~UnaryExpression() {
+    SafeDelete(pmyExp);
 }
 
 

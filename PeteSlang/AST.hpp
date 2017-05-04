@@ -35,8 +35,8 @@ private:
 class NumericConstant : public Expression {
     
 public:
-    NumericConstant(const double value_i): myValue(value_i) {}
-    ~NumericConstant() {}
+    NumericConstant(const double value_i);
+    ~NumericConstant();
     double evaluate(const RuntimeContext* context_i);
     
 private:
@@ -54,8 +54,8 @@ private:
 class BinaryExpression : public Expression {
     
 public:
-    BinaryExpression(Expression* pEx1_i, Expression* pEx2_i, const Operator optr_i): pmyExp1(pEx1_i), pmyExp2(pEx2_i), myOptr(optr_i) {}
-    ~BinaryExpression() {}
+    BinaryExpression(Expression* pEx1_i, Expression* pEx2_i, const Operator optr_i);
+    ~BinaryExpression();
     double evaluate(const RuntimeContext* context_i);
     
 private:
@@ -74,8 +74,8 @@ private:
 class UnaryExpression : public Expression {
     
 public:
-    UnaryExpression(Expression* pEx_i, const Operator optr_i): pmyExp(pEx_i), myOptr(optr_i) {}
-    ~UnaryExpression() {}
+    UnaryExpression(Expression* pEx_i, const Operator optr_i);
+    ~UnaryExpression();
     double evaluate(const RuntimeContext* context_i);
     
 private:

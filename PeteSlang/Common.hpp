@@ -11,6 +11,8 @@
 #ifndef Common_hpp
 #define Common_hpp
 
+#include <iostream>
+
 /*
  * Type to represent Operators used in PeteSlang
  */
@@ -38,9 +40,27 @@ enum Token {
 };
 
 
-/*
- * Some common functions.
- */
+//
+// Common function declarations
+//
 void exit_with_message(const char *err_msg);
+
+
+/*
+ * Function to safe delete a pointer
+ */
+template<class T> void SafeDelete(T*& pVal) {
+    delete pVal;
+    pVal = NULL;
+}
+
+
+/*
+ * Function to safe delete an array
+ */
+template<class T> void SafeDeleteArray( T*& pVal ) {
+    delete[] pVal;
+    pVal = NULL;
+}
 
 #endif /* Common_hpp */

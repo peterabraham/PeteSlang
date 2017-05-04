@@ -23,11 +23,12 @@ int main(int argc, const char * argv[]) {
 //    delete e; e = NULL;
 
     
-    ExpressionBuilder* b = new ExpressionBuilder("-2*(3+3)");
+    ExpressionBuilder* b = new ExpressionBuilder("-4/2*3");
     Expression* e = b->getExpression();
     
     std::cout << e->evaluate(NULL) << endl;
     
+    SafeDelete(e);
     
     return 0;
 }

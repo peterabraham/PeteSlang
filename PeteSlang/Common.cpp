@@ -7,7 +7,6 @@
 //
 
 #include "Common.hpp"
-#include <iostream>
 
 /*
  * Quits process , shows error message
