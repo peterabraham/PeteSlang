@@ -14,6 +14,7 @@
 		D04DB0AB1EB9730000935600 /* Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0A91EB9730000935600 /* Lexer.cpp */; };
 		D04DB0AE1EB982A200935600 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0AC1EB982A200935600 /* Parser.cpp */; };
 		D04DB0B11EB99DBD00935600 /* Builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0AF1EB99DBD00935600 /* Builder.cpp */; };
+		D04DB0B41EBC20BD00935600 /* AST_Statements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0B21EBC20BD00935600 /* AST_Statements.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +44,8 @@
 		D04DB0AD1EB982A200935600 /* Parser.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Parser.hpp; sourceTree = "<group>"; };
 		D04DB0AF1EB99DBD00935600 /* Builder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Builder.cpp; sourceTree = "<group>"; };
 		D04DB0B01EB99DBD00935600 /* Builder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Builder.hpp; sourceTree = "<group>"; };
+		D04DB0B21EBC20BD00935600 /* AST_Statements.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST_Statements.cpp; sourceTree = "<group>"; };
+		D04DB0B31EBC20BD00935600 /* AST_Statements.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AST_Statements.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,8 @@
 				D04DB09B1EB47A2600935600 /* Common.cpp */,
 				D04DB09F1EB47A3200935600 /* AST.hpp */,
 				D04DB09E1EB47A3200935600 /* AST.cpp */,
+				D04DB0B31EBC20BD00935600 /* AST_Statements.hpp */,
+				D04DB0B21EBC20BD00935600 /* AST_Statements.cpp */,
 				D04DB0AA1EB9730000935600 /* Lexer.hpp */,
 				D04DB0A91EB9730000935600 /* Lexer.cpp */,
 				D04DB0AD1EB982A200935600 /* Parser.hpp */,
@@ -151,6 +156,7 @@
 			files = (
 				D04DB0B11EB99DBD00935600 /* Builder.cpp in Sources */,
 				D04DB0A01EB47A3200935600 /* AST.cpp in Sources */,
+				D04DB0B41EBC20BD00935600 /* AST_Statements.cpp in Sources */,
 				D04DB09A1EB47A1600935600 /* RuntimeContext.cpp in Sources */,
 				D04DB08F1EB4620800935600 /* main.cpp in Sources */,
 				D04DB09D1EB47A2600935600 /* Common.cpp in Sources */,
@@ -284,6 +290,7 @@
 				D04DB0941EB4620800935600 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

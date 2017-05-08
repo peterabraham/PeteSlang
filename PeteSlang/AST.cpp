@@ -54,8 +54,8 @@ BinaryExpression::BinaryExpression(Expression* pEx1_i,
  * Dtor of the class BinaryExpression
  */
 BinaryExpression::~BinaryExpression() {
-    SafeDelete(pmyExp1);
-    SafeDelete(pmyExp2);
+    safe_delete(pmyExp1);
+    safe_delete(pmyExp2);
 }
 
 
@@ -102,7 +102,7 @@ UnaryExpression::UnaryExpression(Expression* pEx_i,
  * Dtor of the class UnaryExpression
  */
 UnaryExpression::~UnaryExpression() {
-    SafeDelete(pmyExp);
+    safe_delete(pmyExp);
 }
 
 

@@ -21,11 +21,6 @@ public:
     Expression() {}
     virtual ~Expression() = 0;
     virtual double evaluate(const RuntimeContext* context_i) = 0;
-    
-private:
-    Expression(Expression& exp_i) {}
-    Expression& operator=(const Expression& exp_i) {return *this;}
-    
 };
 
 

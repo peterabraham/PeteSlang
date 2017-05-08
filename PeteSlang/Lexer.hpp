@@ -9,11 +9,26 @@
 #ifndef Lexer_hpp
 #define Lexer_hpp
 
-#include <iostream>
-#include <string>
 #include "AST.hpp"
+#include "AST_Statements.hpp"
 
 using namespace std;
+
+/*
+ * Keyword Table Entry
+ */
+struct ValueTable {
+    Token token;
+    string value;
+    
+    ValueTable() {}
+    
+    ValueTable(Token token_i, string value_i) {
+        token = token_i;
+        value = value_i;
+    }
+};
+
 
 /*
  * A naive Lexical analyzer which looks for operators , Parenthesis
@@ -24,6 +39,7 @@ class Lexer {
     
 public:
     Lexer(const string& expr_i);
+    virtual ~Lexer();
     Token getToken();
     double getNumber() {return myNumber;}
     
@@ -31,11 +47,17 @@ private:
     Lexer(Lexer& lex_i) {}
     Lexer& operator=(const Lexer& lex_i) {return *this;}
     
+    protected:
+    
+    Token myCurrentToken;
+    Token myLastToken;
+    
 private:
-    string myExpr;
-    int    myIndex;
-    int    myExpLength;
-    double myNumber;
+    string      myExpr;
+    int         myIndex;
+    int         myExpLength;
+    double      myNumber;
+    ValueTable** pmyValTable;
 };
 
 #endif /* Lexer_hpp */
