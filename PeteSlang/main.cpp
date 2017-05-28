@@ -7,22 +7,61 @@
 //
 
 #include "Builder.hpp"
+#include <fstream>
+#include <streambuf>
 
-// Test routine for Step 3
-static void test_first_script() {
-    string a = "PRINTLINE 2*10;\n\rPRINTLINE 10;\nPRINT 2*10;\r\n";
-    Parser* p = new Parser(a);
-    vector<Statement*> stmnts = p->parse();
+// Test routine for Step 4
+static void testFileScript(string fileName_i) {
+    ifstream inFile;
+    inFile.open(fileName_i);//open the input file
     
+    stringstream strStream;
+    strStream << inFile.rdbuf();//read the file
+    string prog = strStream.str();//str holds the content of the file
+    
+    // Creates a Parser object with Program text as argument
+    Parser* parser = new Parser(prog);
+    
+    // Creates a compilation context
+    CompilationContext* context = new CompilationContext();
+    
+    // Call the top level Parsing Routine with
+    // Compilation Context as the Argument
+    vector<Statement*> stmnts = parser->parse(context);
+    
+    // if we have reached here , the parse process
+    // is successful... Create a Run time context and
+    // Call Execute statements of each statement...
+    RuntimeContext* runCntxt = new RuntimeContext();
     for (std::vector<Statement*>::iterator it = stmnts.begin() ; it != stmnts.end(); ++it) {
         Statement* st = dynamic_cast<Statement*>(*it);
-        st->execute(nullptr);
+        st->execute(runCntxt);
         safe_delete(st);
     }
+    
+    safe_delete(context);
+    safe_delete(runCntxt);
+    safe_delete(parser);
+    inFile.close();
 }
 
+//// Test routine for Step 3
+//static void test_first_script() {
+//    string a = "PRINTLINE 2*10;\n\rPRINTLINE 10;\nPRINT 2*10;\r\n";
+//    Parser* p = new Parser(a);
+//    vector<Statement*> stmnts = p->parse(nullptr);
+//    
+//    for (std::vector<Statement*>::iterator it = stmnts.begin() ; it != stmnts.end(); ++it) {
+//        Statement* st = dynamic_cast<Statement*>(*it);
+//        st->execute(nullptr);
+//        safe_delete(st);
+//    }
+//}
 
 
+/*
+ * Entry point for the Compiler(Interpretter actually!)
+ */
 int main(int argc, const char * argv[]) {
 
 /// Step 1
@@ -45,9 +84,17 @@ int main(int argc, const char * argv[]) {
 //    safe_delete(e);
     
 /// Step 3
-    test_first_script();
+//    test_first_script();
     
-    return 0;
+// Step 4
+    if(1 >= argc) {
+        exit_with_message("PeteSlang <scriptname>\n");
+    }
+    
+    string file = argv[1];
+    testFileScript(file);
+    
+    return 1;
 }
 
 

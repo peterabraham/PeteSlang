@@ -9,7 +9,7 @@
 #ifndef Lexer_hpp
 #define Lexer_hpp
 
-#include "AST.hpp"
+#include "AST_Expressions.hpp"
 #include "AST_Statements.hpp"
 
 using namespace std;
@@ -47,10 +47,12 @@ private:
     Lexer(Lexer& lex_i) {}
     Lexer& operator=(const Lexer& lex_i) {return *this;}
     
-    protected:
+    void skipToEOL();
     
-    Token myCurrentToken;
-    Token myLastToken;
+protected:
+    Token  myCurrentToken; // Current Token
+    Token  myLastToken;    // Penultimate token
+    string myLastString;   // Last unquoted string 
     
 private:
     string      myExpr;

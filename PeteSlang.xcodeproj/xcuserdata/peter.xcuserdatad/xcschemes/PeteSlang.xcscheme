@@ -61,6 +61,12 @@
             ReferencedContainer = "container:PeteSlang.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Users/peter/CodeHard/Git/PeteSlang/PeteSlang/Examples/First.sl"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>

@@ -15,26 +15,30 @@
 /*
  * Parser is derived from the Lexer class. This class evaluate the
  * expressions by using an algorithm by the name Recursive descent parsing.
+ *
  */
 class Parser : public Lexer {
     
 public:
     Parser(const string expr_i) : Lexer(expr_i) {}
-    Expression* callExpression();
-    vector<Statement*> parse();
+    Expression* callExpression(CompilationContext* context_i);
+    vector<Statement*> parse(CompilationContext* context_i);
     
 protected:
     Token getNext();
     
 private:
-    Expression* expression();
-    Expression* term();
-    Expression* factor();
+    vector<Statement*> statementList(CompilationContext* context_i);
+    Statement* getStatement(CompilationContext* context_i);
     
-    vector<Statement*> statementList();
-    Statement* getStatement();
-    Statement* parsePrintStatement();
-    Statement* parsePrintLineStatement();
+    Expression* expression(CompilationContext* context_i);
+    Expression* term(CompilationContext* context_i);
+    Expression* factor(CompilationContext* context_i);
+    
+    Statement* parsePrintStatement(CompilationContext* context_i);
+    Statement* parsePrintLineStatement(CompilationContext* context_i);
+    Statement* parseVariableDeclStatement(CompilationContext* context_i);
+    Statement* parseAssignmentStatement(CompilationContext* context_i);
     
     Parser(Parser& parser_i) : Lexer("") {}
     Parser& operator=(const Parser& parser_i) {return *this;}

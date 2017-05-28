@@ -20,14 +20,14 @@
  */
 enum Operator {
     OP_ILLEGAL = -1,
-    OP_PLUS,
+    OP_PLUS = 1,
     OP_MINUS,
     OP_MUL,
     OP_DIV
 };
 
 // Token count to populate ValueTable
-const int KEYWORD_COUNT = 2;
+const int KEYWORD_COUNT = 7;
 
 /*
  * Tokens in PeteSlang
@@ -47,7 +47,41 @@ enum Token {
     TOK_PRINT,      // Print Statement
     TOK_PRINTLN,    // PrintLine
     TOK_UNQUOTED_STRING,
-    TOK_SEMI        // ;
+    TOK_SEMI,       // ; Semi column
+    
+    // Step 4 inclusion
+    TOK_VAR_NUMBER, // NUMBER data type
+    TOK_VAR_STRING, // STRING data type
+    TOK_VAR_BOOL,   // Bool data type
+    TOK_NUMERIC,    // [0-9]+
+    TOK_COMMENT,    // Comment token
+    TOK_BOOL_TRUE,  // Boolean TRUE
+    TOK_BOOL_FALSE, // Boolean FALSE
+    TOK_STRING,     // String Literal
+    TOK_ASSIGN      // Assignment Symbol =
+};
+
+
+/*
+ * Type info enumerations
+ */
+enum TypeInfo {
+    TYPE_ILLEGAL = -1, // NOT A TYPE
+    TYPE_NUMERIC = 1,      // IEEE Double precision floating point
+    TYPE_BOOL,         // Boolean Data type
+    TYPE_STRING,       // String data type
+};
+
+/*
+ * Symbol Table entry for variable using Attributes
+ */
+class SymbolInfo {
+public:
+    std::string mySymbolName;
+    TypeInfo    myType;
+    std::string myStrVal;
+    double      myDblVal;
+    bool        myBoolVal;
 };
 
 

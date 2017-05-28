@@ -8,13 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		D04DB08F1EB4620800935600 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB08E1EB4620800935600 /* main.cpp */; };
-		D04DB09A1EB47A1600935600 /* RuntimeContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0981EB47A1600935600 /* RuntimeContext.cpp */; };
+		D04DB09A1EB47A1600935600 /* MemoryContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0981EB47A1600935600 /* MemoryContext.cpp */; };
 		D04DB09D1EB47A2600935600 /* Common.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB09B1EB47A2600935600 /* Common.cpp */; };
-		D04DB0A01EB47A3200935600 /* AST.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB09E1EB47A3200935600 /* AST.cpp */; };
+		D04DB0A01EB47A3200935600 /* AST_Expressions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB09E1EB47A3200935600 /* AST_Expressions.cpp */; };
 		D04DB0AB1EB9730000935600 /* Lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0A91EB9730000935600 /* Lexer.cpp */; };
 		D04DB0AE1EB982A200935600 /* Parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0AC1EB982A200935600 /* Parser.cpp */; };
 		D04DB0B11EB99DBD00935600 /* Builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0AF1EB99DBD00935600 /* Builder.cpp */; };
 		D04DB0B41EBC20BD00935600 /* AST_Statements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D04DB0B21EBC20BD00935600 /* AST_Statements.cpp */; };
+		D07D7FB61EC2C77500C8E882 /* SymbolTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D07D7FB41EC2C77500C8E882 /* SymbolTable.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -32,12 +33,12 @@
 /* Begin PBXFileReference section */
 		D04DB08B1EB4620800935600 /* PeteSlang */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PeteSlang; sourceTree = BUILT_PRODUCTS_DIR; };
 		D04DB08E1EB4620800935600 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		D04DB0981EB47A1600935600 /* RuntimeContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RuntimeContext.cpp; sourceTree = "<group>"; };
-		D04DB0991EB47A1600935600 /* RuntimeContext.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RuntimeContext.hpp; sourceTree = "<group>"; };
+		D04DB0981EB47A1600935600 /* MemoryContext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MemoryContext.cpp; sourceTree = "<group>"; };
+		D04DB0991EB47A1600935600 /* MemoryContext.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MemoryContext.hpp; sourceTree = "<group>"; };
 		D04DB09B1EB47A2600935600 /* Common.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Common.cpp; sourceTree = "<group>"; };
 		D04DB09C1EB47A2600935600 /* Common.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Common.hpp; sourceTree = "<group>"; };
-		D04DB09E1EB47A3200935600 /* AST.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST.cpp; sourceTree = "<group>"; };
-		D04DB09F1EB47A3200935600 /* AST.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AST.hpp; sourceTree = "<group>"; };
+		D04DB09E1EB47A3200935600 /* AST_Expressions.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST_Expressions.cpp; sourceTree = "<group>"; };
+		D04DB09F1EB47A3200935600 /* AST_Expressions.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AST_Expressions.hpp; sourceTree = "<group>"; };
 		D04DB0A91EB9730000935600 /* Lexer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lexer.cpp; sourceTree = "<group>"; };
 		D04DB0AA1EB9730000935600 /* Lexer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Lexer.hpp; sourceTree = "<group>"; };
 		D04DB0AC1EB982A200935600 /* Parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Parser.cpp; sourceTree = "<group>"; };
@@ -46,6 +47,8 @@
 		D04DB0B01EB99DBD00935600 /* Builder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = Builder.hpp; sourceTree = "<group>"; };
 		D04DB0B21EBC20BD00935600 /* AST_Statements.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AST_Statements.cpp; sourceTree = "<group>"; };
 		D04DB0B31EBC20BD00935600 /* AST_Statements.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = AST_Statements.hpp; sourceTree = "<group>"; };
+		D07D7FB41EC2C77500C8E882 /* SymbolTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SymbolTable.cpp; sourceTree = "<group>"; };
+		D07D7FB51EC2C77500C8E882 /* SymbolTable.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SymbolTable.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,12 +82,12 @@
 			isa = PBXGroup;
 			children = (
 				D04DB08E1EB4620800935600 /* main.cpp */,
-				D04DB0991EB47A1600935600 /* RuntimeContext.hpp */,
-				D04DB0981EB47A1600935600 /* RuntimeContext.cpp */,
+				D04DB0991EB47A1600935600 /* MemoryContext.hpp */,
+				D04DB0981EB47A1600935600 /* MemoryContext.cpp */,
 				D04DB09C1EB47A2600935600 /* Common.hpp */,
 				D04DB09B1EB47A2600935600 /* Common.cpp */,
-				D04DB09F1EB47A3200935600 /* AST.hpp */,
-				D04DB09E1EB47A3200935600 /* AST.cpp */,
+				D04DB09F1EB47A3200935600 /* AST_Expressions.hpp */,
+				D04DB09E1EB47A3200935600 /* AST_Expressions.cpp */,
 				D04DB0B31EBC20BD00935600 /* AST_Statements.hpp */,
 				D04DB0B21EBC20BD00935600 /* AST_Statements.cpp */,
 				D04DB0AA1EB9730000935600 /* Lexer.hpp */,
@@ -93,6 +96,8 @@
 				D04DB0AC1EB982A200935600 /* Parser.cpp */,
 				D04DB0B01EB99DBD00935600 /* Builder.hpp */,
 				D04DB0AF1EB99DBD00935600 /* Builder.cpp */,
+				D07D7FB51EC2C77500C8E882 /* SymbolTable.hpp */,
+				D07D7FB41EC2C77500C8E882 /* SymbolTable.cpp */,
 			);
 			path = PeteSlang;
 			sourceTree = "<group>";
@@ -155,10 +160,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				D04DB0B11EB99DBD00935600 /* Builder.cpp in Sources */,
-				D04DB0A01EB47A3200935600 /* AST.cpp in Sources */,
+				D04DB0A01EB47A3200935600 /* AST_Expressions.cpp in Sources */,
 				D04DB0B41EBC20BD00935600 /* AST_Statements.cpp in Sources */,
-				D04DB09A1EB47A1600935600 /* RuntimeContext.cpp in Sources */,
+				D04DB09A1EB47A1600935600 /* MemoryContext.cpp in Sources */,
 				D04DB08F1EB4620800935600 /* main.cpp in Sources */,
+				D07D7FB61EC2C77500C8E882 /* SymbolTable.cpp in Sources */,
 				D04DB09D1EB47A2600935600 /* Common.cpp in Sources */,
 				D04DB0AE1EB982A200935600 /* Parser.cpp in Sources */,
 				D04DB0AB1EB9730000935600 /* Lexer.cpp in Sources */,

@@ -23,5 +23,5 @@ Expression* ExpressionBuilder::getExpression() {
         exit_with_message("Unhandled excpetion occured");
     }
     
-    return parser->callExpression();
+    return nullptr;//parser->callExpression();
 }

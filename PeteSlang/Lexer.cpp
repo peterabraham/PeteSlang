@@ -17,8 +17,14 @@ Lexer::Lexer(const string& expr_i) : myExpr(expr_i),
                                      myIndex(0)
 {
     pmyValTable    = new ValueTable*[KEYWORD_COUNT];
-    pmyValTable[0] = new ValueTable(TOK_PRINT, "PRINT");
-    pmyValTable[1] = new ValueTable(TOK_PRINTLN, "PRINTLINE");
+    
+    pmyValTable[0] = new ValueTable(TOK_BOOL_FALSE, "FALSE");
+    pmyValTable[1] = new ValueTable(TOK_BOOL_TRUE, "TRUE");
+    pmyValTable[2] = new ValueTable(TOK_VAR_STRING, "STRING");
+    pmyValTable[3] = new ValueTable(TOK_VAR_BOOL, "BOOLEAN");
+    pmyValTable[4] = new ValueTable(TOK_VAR_NUMBER, "NUMERIC");
+    pmyValTable[5] = new ValueTable(TOK_PRINT, "PRINT");
+    pmyValTable[6] = new ValueTable(TOK_PRINTLN, "PRINTLINE");
 }
 
 /*
@@ -70,8 +76,13 @@ start:
         }
         
         case '/': {
-            tok = TOK_DIV;
-            myIndex++;
+            if (myExpr[myIndex + 1] == '/') {
+                skipToEOL();
+                goto start;
+            }else {
+                tok = TOK_DIV;
+                myIndex++;
+            }
             break;
         }
         
@@ -92,41 +103,70 @@ start:
             myIndex++;
             break;
         }
-        
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        {
+            
+        case '=': {
+            tok = TOK_ASSIGN;
+            myIndex++;
+            break;
+        }
+           
+        case '"': {
             string str = "";
-            while ((myExpr[myIndex] == '0' || myExpr[myIndex] == '1' || myExpr[myIndex] == '2' ||
-                    myExpr[myIndex] == '3' || myExpr[myIndex] == '4' || myExpr[myIndex] == '5' ||
-                    myExpr[myIndex] == '6' || myExpr[myIndex] == '7' || myExpr[myIndex] == '8' ||
-                    myExpr[myIndex] == '9') && (myIndex < myExpLength))
-            {
+            myIndex++;
+            while ((myIndex < myExpLength) && myExpr[myIndex] != '"' ) {
                 str += myExpr[myIndex];
                 myIndex++;
             }
-            
-            myNumber = atof(str.c_str());
-            tok = TOK_DOUBLE;
+            if (myIndex == myExpLength) {
+                tok = TOK_ILLEGAL;
+            }else {
+                myIndex++;
+                myLastString = str;
+                tok = TOK_STRING;
+            }
             break;
         }
         
         default: {
+            
+            if (isdigit(myExpr[myIndex])) {
+                string str = "";
+                while ((myExpr[myIndex] == '0' || myExpr[myIndex] == '1' || myExpr[myIndex] == '2' ||
+                        myExpr[myIndex] == '3' || myExpr[myIndex] == '4' || myExpr[myIndex] == '5' ||
+                        myExpr[myIndex] == '6' || myExpr[myIndex] == '7' || myExpr[myIndex] == '8' ||
+                        myExpr[myIndex] == '9') && (myIndex < myExpLength))
+                {
+                    str += myExpr[myIndex];
+                    myIndex++;
+                }
+                
+                if ('.' == myExpr[myIndex]) {
+                    str += '.';
+                    myIndex++;
+                    while ((myExpr[myIndex] == '0' || myExpr[myIndex] == '1' || myExpr[myIndex] == '2' ||
+                            myExpr[myIndex] == '3' || myExpr[myIndex] == '4' || myExpr[myIndex] == '5' ||
+                            myExpr[myIndex] == '6' || myExpr[myIndex] == '7' || myExpr[myIndex] == '8' ||
+                            myExpr[myIndex] == '9') && (myIndex < myExpLength))
+                    {
+                        str += myExpr[myIndex];
+                        myIndex++;
+                    }
+                }
+                
+                myNumber = atof(str.c_str());
+                tok = TOK_NUMERIC;
+                break;
+            }
+            
             if (isalpha(myExpr[myIndex])) {
                 string str = "";
+                string var = "";
                 str += myExpr[myIndex];
                 
                 while ((++myIndex < myExpLength) && (isalnum(myExpr[myIndex]) || '_' == myExpr[myIndex])) {
                     str += myExpr[myIndex];
                 }
+                var = str;
                 
                 // Convert to upper case
                 transform(str.begin(), str.end(), str.begin(), ::toupper);
@@ -137,7 +177,9 @@ start:
                         return t->token;
                     }
                 }
-                return TOK_UNQUOTED_STRING;
+                
+                myLastString = var;
+                tok =  TOK_UNQUOTED_STRING;
             } else {
                 exit_with_message("Error while analysing tokens");
             }
@@ -146,4 +188,26 @@ start:
     }
     
     return tok;
+}
+
+
+/*
+ * Skip to the End of Line
+ */
+void Lexer::skipToEOL() {
+    while (myIndex < myExpLength && '\r' != myExpr[myIndex] && '\n' != myExpr[myIndex]) {
+        myIndex++;
+    }
+    
+    if (myIndex == myExpLength) {
+        return;
+    }
+    
+    if ( '\n' == myExpr[myIndex + 1]) {
+        myIndex += 2;
+        return;
+    }
+    
+    myIndex++;
+    return;
 }
