@@ -52,7 +52,7 @@ TypeInfo BooleanConstant::typeCheck(CompilationContext* contxt_i) {
 
 
 /*
- * Function to get the type.
+ * Function to get the type
  */
 TypeInfo BooleanConstant::getType() {
     return pmySymbolInfo->myType;
@@ -96,7 +96,7 @@ TypeInfo NumericConstant::typeCheck(CompilationContext* contxt_i) {
 
 
 /*
- * Function to get the type.
+ * Function to get the type
  */
 TypeInfo NumericConstant::getType() {
     return pmySymbolInfo->myType;
@@ -140,7 +140,7 @@ TypeInfo StringLiteral::typeCheck(CompilationContext* contxt_i) {
 
 
 /*
- * Function to get the type.
+ * Function to get the type
  */
 TypeInfo StringLiteral::getType() {
     return pmySymbolInfo->myType;
@@ -205,7 +205,7 @@ Variable::~Variable() {
 
 /*
  * To evaluate a variable we just need to
- * look up in the Symbol of RuntimeContext.
+ * look up in the Symbol of RuntimeContext
  */
 SymbolInfo* Variable::evaluate(RuntimeContext* context_i) {
     if(nullptr == context_i->getSymbolTable()) {
@@ -218,7 +218,7 @@ SymbolInfo* Variable::evaluate(RuntimeContext* context_i) {
 
 
 /*
- * Look up in the Symbol table and return the type info.
+ * Look up in the Symbol table and return the type info
  */
 TypeInfo Variable::typeCheck(CompilationContext* context_i) {
     TypeInfo retVal = TYPE_ILLEGAL;
@@ -226,7 +226,7 @@ TypeInfo Variable::typeCheck(CompilationContext* context_i) {
     if(nullptr != context_i->getSymbolTable()) {
         SymbolInfo* info = context_i->getInfo(myVariableName);
         
-        if(nullptr == info) {
+        if(nullptr != info) {
             myTypeInfo = info->myType;
             retVal = myTypeInfo;
         }
@@ -308,7 +308,7 @@ TypeInfo BinaryPlus::typeCheck(CompilationContext* context_i) {
 
 
 /*
- * Function to return the type of operands.
+ * Function to return the type of operands
  */
 TypeInfo BinaryPlus::getType() {
     return myTypeInfo;
@@ -374,7 +374,7 @@ TypeInfo BinaryMinus::typeCheck(CompilationContext* context_i) {
 
 
 /*
- * Function to return the type of operands.
+ * Function to return the type of operands
  */
 TypeInfo BinaryMinus::getType() {
     return myTypeInfo;
@@ -440,7 +440,7 @@ TypeInfo Multiply::typeCheck(CompilationContext* context_i) {
 
 
 /*
- * Function to return the type of operands.
+ * Function to return the type of operands
  */
 TypeInfo Multiply::getType() {
     return myTypeInfo;
@@ -507,7 +507,7 @@ TypeInfo Divide::typeCheck(CompilationContext* context_i) {
 
 
 /*
- * Function to return the type of operands.
+ * Function to return the type of operands
  */
 TypeInfo Divide::getType() {
     return myTypeInfo;
@@ -569,7 +569,7 @@ TypeInfo UnaryPlus::typeCheck(CompilationContext* context_i) {
 
 
 /*
- * Function to return the type of operands.
+ * Function to return the type of operands
  */
 TypeInfo UnaryPlus::getType() {
     return myTypeInfo;
@@ -631,8 +631,241 @@ TypeInfo UnaryMinus::typeCheck(CompilationContext* context_i) {
 
 
 /*
- * Function to return the type of operands.
+ * Function to return the type of operands
  */
 TypeInfo UnaryMinus::getType() {
     return myTypeInfo;
+}
+
+
+///--------------------------------------------------------------------------
+/*
+ * Ctor of the class RelationalExpression
+ */
+RelationalExpression::RelationalExpression(Expression* exp1_i,
+                                           Expression* exp2_i,
+                                           RelationalOperator opearator_i) : pmyExp1(exp1_i),
+                                                                             pmyExp2(exp2_i),
+                                                                             myOperator(opearator_i) {
+}
+
+
+/*
+ * Dtor of the class RelationalExpression
+ */
+RelationalExpression::~RelationalExpression() {
+}
+
+
+/*
+ * Function to evaluate all the PeteSlang supported relational operators
+ */
+SymbolInfo* RelationalExpression::evaluate(RuntimeContext* context_i) {
+    SymbolInfo* leftInfo  = pmyExp1->evaluate(context_i);
+    SymbolInfo* rightInfo = pmyExp2->evaluate(context_i);
+    
+    if (leftInfo->myType != rightInfo->myType) {
+        return nullptr;
+    }
+    
+    SymbolInfo* pRetSymbol = new SymbolInfo();
+    pRetSymbol->myType = TYPE_BOOL;
+    pRetSymbol->mySymbolName = "";
+    
+    switch (leftInfo->myType) {
+        case TYPE_NUMERIC: {
+            if (myOperator == REL_OP_EQ) {
+                pRetSymbol->myBoolVal = leftInfo->myDblVal == rightInfo->myDblVal;
+            } else if (myOperator == REL_OP_NEQ) {
+                pRetSymbol->myBoolVal = leftInfo->myDblVal != rightInfo->myDblVal;
+            } else if (myOperator == REL_OP_GT) {
+                pRetSymbol->myBoolVal = leftInfo->myDblVal > rightInfo->myDblVal;
+            } else if (myOperator == REL_OP_LT) {
+                pRetSymbol->myBoolVal = leftInfo->myDblVal < rightInfo->myDblVal;
+            } else if (myOperator == REL_OP_GTE) {
+                pRetSymbol->myBoolVal = leftInfo->myDblVal >= rightInfo->myDblVal;
+            } else if (myOperator == REL_OP_LTE) {
+                pRetSymbol->myBoolVal = leftInfo->myDblVal <= rightInfo->myDblVal;
+            } else {
+                pRetSymbol->myBoolVal = false;
+            }
+            break;
+        }
+        
+        case TYPE_STRING:{
+            if (myOperator == REL_OP_EQ) {
+                pRetSymbol->myBoolVal = (0 == leftInfo->myStrVal.compare(rightInfo->myStrVal));
+            } else if (myOperator == REL_OP_NEQ) {
+                pRetSymbol->myBoolVal = (0 != leftInfo->myStrVal.compare(rightInfo->myStrVal));
+            } else {
+                pRetSymbol->myBoolVal = false;
+            }
+            break;
+        }
+            
+        case TYPE_BOOL: {
+            if (myOperator == REL_OP_EQ) {
+                pRetSymbol->myBoolVal = leftInfo->myBoolVal == rightInfo->myBoolVal;
+            } else if (myOperator == REL_OP_NEQ) {
+                pRetSymbol->myBoolVal = leftInfo->myBoolVal != rightInfo->myBoolVal;
+            } else {
+                pRetSymbol->myBoolVal = false;
+            }
+            break;
+        }
+            
+        default: {
+            safe_delete(pRetSymbol);
+            return nullptr;
+        }
+    }
+    
+    return pRetSymbol;
+}
+
+
+/*
+ * Function to perform type check on relational expressions
+ */
+TypeInfo RelationalExpression::typeCheck(CompilationContext* contxt_i) {
+    TypeInfo leftInfo  = pmyExp1->typeCheck(contxt_i);
+    TypeInfo rightInfo = pmyExp2->typeCheck(contxt_i);
+    
+    if (leftInfo != rightInfo) {
+        exit_with_message("Wrong Type in expression");
+    }
+    
+    if (leftInfo == TYPE_STRING && !(REL_OP_EQ == myOperator || REL_OP_NEQ == myOperator)) {
+        exit_with_message("Only == amd != supported for string type ");
+    }
+    
+    if (leftInfo == TYPE_BOOL && !(REL_OP_EQ == myOperator || REL_OP_NEQ == myOperator)) {
+        exit_with_message("Only == amd != supported for bool type ");
+    }
+    
+    myOperandsType = leftInfo;
+    myNodeType = TYPE_BOOL;
+    
+    return myNodeType;
+}
+
+
+/*
+ * Fuction to return the type of the current node
+ */
+TypeInfo RelationalExpression::getType() {
+    return myNodeType;
+}
+
+
+///--------------------------------------------------------------------------
+/*
+ * Ctor of the class LogicalExpression
+ */
+LogicalExpression::LogicalExpression(Expression* exp1_i,
+                                     Expression* exp2_i,
+                                     Token opearator_i) : pmyExp1(exp1_i),
+                                                          pmyExp2(exp2_i),
+                                                          myOperator(opearator_i) {
+}
+
+
+/*
+ * Dtor of the class LogicalExpression
+ */
+LogicalExpression::~LogicalExpression() {
+}
+
+
+/*
+ * Function to evaluate all the PeteSlang supported logical operators
+ */
+SymbolInfo* LogicalExpression::evaluate(RuntimeContext* context_i) {
+    SymbolInfo* leftInfo  = pmyExp1->evaluate(context_i);
+    SymbolInfo* rightInfo = pmyExp2->evaluate(context_i);
+    
+    if ((leftInfo->myType != rightInfo->myType) &&
+        (TYPE_BOOL != leftInfo->myType)) {
+        return nullptr;
+    }
+    
+    SymbolInfo* pRetSymbol = new SymbolInfo();
+    pRetSymbol->myType = TYPE_BOOL;
+    pRetSymbol->mySymbolName = "";
+    
+    if (TOK_AND == myOperator) {
+        pRetSymbol->myBoolVal = (leftInfo->myBoolVal && rightInfo->myBoolVal);
+    } else if (TOK_OR == myOperator) {
+        pRetSymbol->myBoolVal = (leftInfo->myBoolVal || rightInfo->myBoolVal);
+    } else {
+        pRetSymbol->myBoolVal = false;
+    }
+    
+    return pRetSymbol;
+}
+
+
+/*
+ * Function to perform type check on logical expressions
+ */
+TypeInfo LogicalExpression::typeCheck(CompilationContext* contxt_i) {
+    TypeInfo leftInfo  = pmyExp1->typeCheck(contxt_i);
+    TypeInfo rightInfo = pmyExp2->typeCheck(contxt_i);
+    
+    if ((leftInfo == rightInfo) && (leftInfo == TYPE_BOOL)) {
+        myNodeType = TYPE_BOOL;
+    } else {
+        exit_with_message("Wrong Type in expression");
+    }
+    
+    return myNodeType;
+}
+
+
+/*
+ * Fuction to return the type of the current node
+ */
+TypeInfo LogicalExpression::getType() {
+    return myNodeType;
+}
+
+
+///--------------------------------------------------------------------------
+/*
+ * Function to evaluate the logical NOT operator
+ */
+SymbolInfo* LogicalNot::evaluate(RuntimeContext* context_i) {
+    SymbolInfo* leftInfo  = pmyExp->evaluate(context_i);
+    
+    if (TYPE_BOOL == leftInfo->myType) {
+        SymbolInfo* pRetSymbol = new SymbolInfo();
+        pRetSymbol->myType = TYPE_BOOL;
+        pRetSymbol->mySymbolName = "";
+        pRetSymbol->myBoolVal = !leftInfo->myBoolVal;
+        return pRetSymbol;
+    }
+    return nullptr;
+}
+
+
+/*
+ * Function to type check on the logical not operator.
+ */
+TypeInfo LogicalNot::typeCheck(CompilationContext* contxt_i) {
+    TypeInfo leftInfo = pmyExp->typeCheck(contxt_i);
+    
+    if (TYPE_BOOL != leftInfo) {
+        exit_with_message("Wrong Type in expression");
+    }
+    myNodeType = TYPE_BOOL;
+    
+    return myNodeType;
+}
+
+
+/*
+ * Function to evaluate all the PeteSlang supported logical operators.
+ */
+TypeInfo LogicalNot::getType() {
+    return myNodeType;
 }

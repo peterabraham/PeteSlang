@@ -10,6 +10,7 @@
 #define AST_Statements_hpp
 
 #include "AST_Expressions.hpp"
+#include <vector>
 
 /*
  * Statement is what you Execute for it's Effect
@@ -99,5 +100,48 @@ private:
 private:
     SymbolInfo* pmySymbolInfo;
     Variable*   pmyVar;
+};
+
+
+/*
+ * Class to evaluate an IF condition
+ */
+class IfStatement : public Statement {
+    
+public:
+    IfStatement(Expression* exp_i,
+                std::vector<Statement*> ifStatements_i,
+                std::vector<Statement*> elseStatements_i);
+    ~IfStatement();
+    SymbolInfo* execute(RuntimeContext* context_i);
+    
+private:
+    IfStatement(IfStatement& stmnt_i) {}
+    IfStatement& operator=(const IfStatement& stmnt_i) {return *this;}
+    
+private:
+    Expression* pmyCondition;
+    std::vector<Statement*> myStatements;
+    std::vector<Statement*> myElsePart;
+};
+
+
+/*
+ * Class to evaluate an WHILE condition
+ */
+class WhileStatement : public Statement {
+    
+public:
+    WhileStatement(Expression* exp_i, std::vector<Statement*> statements_i);
+    ~WhileStatement();
+    SymbolInfo* execute(RuntimeContext* context_i);
+    
+private:
+    WhileStatement(WhileStatement& stmnt_i) {}
+    WhileStatement& operator=(const WhileStatement& stmnt_i) {return *this;}
+    
+private:
+    Expression* pmyCondition;
+    std::vector<Statement*> myStatements;
 };
 #endif /* AST_Statement_hpp */

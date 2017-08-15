@@ -239,4 +239,72 @@ private:
     Expression *pmyExp;
     TypeInfo   myTypeInfo;
 };
+
+
+/*
+ * The node to represent a relational expression
+ */
+class RelationalExpression : public Expression {
+public:
+    RelationalExpression(Expression* exp1_i, Expression* exp2_i, RelationalOperator opearator_i);
+    ~RelationalExpression();
+    SymbolInfo* evaluate(RuntimeContext* context_i);
+    TypeInfo typeCheck(CompilationContext* contxt_i);
+    TypeInfo getType();
+    
+private:
+    RelationalExpression(RelationalExpression& exp) {}
+    RelationalExpression& operator=(const RelationalExpression& exp_i) {return *this;}
+    
+private:
+    Expression* pmyExp1;
+    Expression* pmyExp2;
+    RelationalOperator myOperator;
+    TypeInfo myNodeType;
+    TypeInfo myOperandsType;
+};
+
+
+/*
+ * The node to represent a logical expression
+ */
+class LogicalExpression : public Expression {
+public:
+    LogicalExpression(Expression* exp1_i, Expression* exp2_i, Token opearator_i);
+    ~LogicalExpression();
+    SymbolInfo* evaluate(RuntimeContext* context_i);
+    TypeInfo typeCheck(CompilationContext* contxt_i);
+    TypeInfo getType();
+    
+private:
+    LogicalExpression(LogicalExpression& exp) {}
+    LogicalExpression& operator=(const LogicalExpression& exp_i) {return *this;}
+    
+private:
+    Expression* pmyExp1;
+    Expression* pmyExp2;
+    Token myOperator;
+    TypeInfo myNodeType;
+};
+
+
+/*
+ * The node to represent a logical NOT
+ */
+class LogicalNot : public Expression {
+public:
+    LogicalNot(Expression* exp1_i) : pmyExp(exp1_i) {}
+    ~LogicalNot() {}
+    SymbolInfo* evaluate(RuntimeContext* context_i);
+    TypeInfo typeCheck(CompilationContext* contxt_i);
+    TypeInfo getType();
+    
+private:
+    LogicalNot(LogicalNot& exp) {}
+    LogicalNot& operator=(const LogicalNot& exp_i) {return *this;}
+    
+private:
+    Expression* pmyExp;
+    TypeInfo myNodeType;
+};
 #endif /* AST_hpp */

@@ -18,13 +18,19 @@ Lexer::Lexer(const string& expr_i) : myExpr(expr_i),
 {
     pmyValTable    = new ValueTable*[KEYWORD_COUNT];
     
-    pmyValTable[0] = new ValueTable(TOK_BOOL_FALSE, "FALSE");
-    pmyValTable[1] = new ValueTable(TOK_BOOL_TRUE, "TRUE");
-    pmyValTable[2] = new ValueTable(TOK_VAR_STRING, "STRING");
-    pmyValTable[3] = new ValueTable(TOK_VAR_BOOL, "BOOLEAN");
-    pmyValTable[4] = new ValueTable(TOK_VAR_NUMBER, "NUMERIC");
-    pmyValTable[5] = new ValueTable(TOK_PRINT, "PRINT");
-    pmyValTable[6] = new ValueTable(TOK_PRINTLN, "PRINTLINE");
+    pmyValTable[0]  = new ValueTable(TOK_BOOL_FALSE, "FALSE");
+    pmyValTable[1]  = new ValueTable(TOK_BOOL_TRUE, "TRUE");
+    pmyValTable[2]  = new ValueTable(TOK_VAR_STRING, "STRING");
+    pmyValTable[3]  = new ValueTable(TOK_VAR_BOOL, "BOOLEAN");
+    pmyValTable[4]  = new ValueTable(TOK_VAR_NUMBER, "NUMERIC");
+    pmyValTable[5]  = new ValueTable(TOK_PRINT, "PRINT");
+    pmyValTable[6]  = new ValueTable(TOK_PRINTLN, "PRINTLINE");
+    pmyValTable[7]  = new ValueTable(TOK_IF, "IF");
+    pmyValTable[8]  = new ValueTable(TOK_WHILE, "WHILE");
+    pmyValTable[9]  = new ValueTable(TOK_WEND, "WEND");
+    pmyValTable[10] = new ValueTable(TOK_ELSE, "ELSE");
+    pmyValTable[11] = new ValueTable(TOK_ENDIF, "ENDIF");
+    pmyValTable[12] = new ValueTable(TOK_THEN, "THEN");
 }
 
 /*
@@ -104,9 +110,67 @@ start:
             break;
         }
             
-        case '=': {
-            tok = TOK_ASSIGN;
+        case '!': {
+            tok = TOK_NOT;
             myIndex++;
+            break;
+        }
+            
+        case '>': {
+            if (myExpr[myIndex + 1] == '=') {
+                tok = TOK_GTE;
+                myIndex += 2;
+            } else {
+                tok = TOK_GT;
+                myIndex++;
+            }
+            break;
+        }
+            
+        case '<': {
+            if (myExpr[myIndex + 1] == '=') {
+                tok = TOK_LTE;
+                myIndex += 2;
+            } else if (myExpr[myIndex + 1] == '>') {
+                tok = TOK_NEQ;
+                myIndex += 2;
+            } else {
+                tok = TOK_LT;
+                myIndex++;
+            }
+            break;
+        }
+            
+        case '=': {
+            if (myExpr[myIndex + 1] == '=') {
+                tok = TOK_EQ;
+                myIndex += 2;
+            } else {
+                tok = TOK_ASSIGN;
+                myIndex++;
+            }
+            break;
+        }
+            
+        case '&': {
+            if (myExpr[myIndex + 1] == '&') {
+                tok = TOK_AND;
+                myIndex += 2;
+            } else {
+                tok = TOK_ILLEGAL;
+                myIndex++;
+            }
+            break;
+        }
+            
+        case '|': {
+            if (myExpr[myIndex + 1] == '|') {
+                tok = TOK_OR;
+                myIndex += 2;
+            } else {
+                tok = TOK_ILLEGAL;
+                myIndex++;
+            }
             break;
         }
            

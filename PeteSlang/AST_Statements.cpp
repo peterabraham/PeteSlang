@@ -137,7 +137,7 @@ SymbolInfo* AssignmentStatement::execute(RuntimeContext* context_i) {
     SymbolInfo* value = pmyExp->evaluate(context_i);
     context_i->assignInfo(pmyVar, value);
     
-    return value;
+    return nullptr;
 }
 
 
@@ -165,4 +165,100 @@ SymbolInfo* VariableDeclStatement::execute(RuntimeContext* context_i) {
     pmyVar = new Variable(pmySymbolInfo);
     
     return nullptr;
+}
+
+
+///-------------------------------------------------------------------
+/*
+ * Ctor of IfStatement class
+ */
+IfStatement::IfStatement(Expression* exp_i,
+                         std::vector<Statement*> ifStatements_i,
+                         std::vector<Statement*> elseStatements_i) : pmyCondition(exp_i),
+                                                                     myStatements(ifStatements_i),
+                                                                     myElsePart(elseStatements_i) {
+}
+
+
+/*
+ * Dtor of IfStatement class
+ */
+IfStatement::~IfStatement() {
+}
+
+
+/*
+ * Function to evaluate the if statement.
+ */
+SymbolInfo* IfStatement::execute(RuntimeContext* context_i) {
+    SymbolInfo* pRetSymbol = pmyCondition->evaluate(context_i);
+    
+    if (nullptr == pRetSymbol && TYPE_BOOL != pRetSymbol->myType) {
+        return nullptr;
+    }
+    
+    if (true == pRetSymbol->myBoolVal) {
+        for (std::vector<Statement*>::iterator it = myStatements.begin() ; it != myStatements.end(); ++it) {
+            Statement* st = dynamic_cast<Statement*>(*it);
+            st->execute(context_i);
+        }
+    } else if (false  == pRetSymbol->myBoolVal) {
+        for (std::vector<Statement*>::iterator it = myElsePart.begin() ; it != myElsePart.end(); ++it) {
+            Statement* st = dynamic_cast<Statement*>(*it);
+            st->execute(context_i);
+        }
+    }
+    
+    myStatements.clear();
+    myStatements.clear();
+    
+    return nullptr;
+}
+
+
+///-------------------------------------------------------------------
+/*
+ * Ctor of IfStatement class
+ */
+WhileStatement::WhileStatement(Expression* exp_i,
+                               std::vector<Statement*> statements_i) : pmyCondition(exp_i),
+                                                                       myStatements(statements_i) {
+}
+
+
+/*
+ * Dtor of IfStatement class
+ */
+WhileStatement::~WhileStatement() {
+}
+
+
+/*
+ * Function to execute the while statement
+ */
+SymbolInfo* WhileStatement::execute(RuntimeContext* context_i) {
+Loop:
+    SymbolInfo* pInfo = pmyCondition->evaluate(context_i);
+    
+    if (nullptr == pInfo && TYPE_BOOL != pInfo->myType) {
+        myStatements.clear();
+        return nullptr;
+    }
+    
+    if (true != pInfo->myBoolVal) {
+        myStatements.clear();
+        return nullptr;
+    }
+    
+    SymbolInfo* pRetSymbol = nullptr;
+    for (std::vector<Statement*>::iterator it = myStatements.begin() ; it != myStatements.end(); ++it) {
+        Statement* st = dynamic_cast<Statement*>(*it);
+        pRetSymbol = st->execute(context_i);
+        if (nullptr != pRetSymbol) {
+            myStatements.clear();
+            return pRetSymbol;
+        }
+    }
+    
+    goto Loop;
 }

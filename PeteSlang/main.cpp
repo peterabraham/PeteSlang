@@ -36,9 +36,9 @@ static void testFileScript(string fileName_i) {
     for (std::vector<Statement*>::iterator it = stmnts.begin() ; it != stmnts.end(); ++it) {
         Statement* st = dynamic_cast<Statement*>(*it);
         st->execute(runCntxt);
-        safe_delete(st);
     }
     
+    stmnts.clear();
     safe_delete(context);
     safe_delete(runCntxt);
     safe_delete(parser);

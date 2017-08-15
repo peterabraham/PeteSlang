@@ -46,7 +46,10 @@ Token Parser::getNext() {
 vector<Statement*> Parser::statementList(CompilationContext* context_i) {
     vector<Statement*> statements;
     
-    while (myCurrentToken != TOK_NULL) {
+    while (TOK_ELSE  != myCurrentToken &&
+           TOK_ENDIF != myCurrentToken &&
+           TOK_WEND  != myCurrentToken &&
+           TOK_NULL  != myCurrentToken) {
         Statement* st = getStatement(context_i);
         if (NULL != st) {
             statements.insert(statements.end(), st);
@@ -80,6 +83,16 @@ Statement* Parser::getStatement(CompilationContext* context_i) {
             getNext();
             break;
         }
+        case TOK_IF: {
+            retval = parseIfStatement(context_i);
+            getNext();
+            break;
+        }
+        case TOK_WHILE: {
+            retval = parseWhileStatement(context_i);
+            getNext();
+            break;
+        }
         case TOK_UNQUOTED_STRING: {
             retval = parseAssignmentStatement(context_i);
             getNext();
@@ -93,10 +106,88 @@ Statement* Parser::getStatement(CompilationContext* context_i) {
 
 
 /*
+ * Function to evaluate in logical expression level in RD parser algorithm
+ */
+Expression* Parser::bExpression(CompilationContext* context_i) {
+    Token lastToken = TOK_ILLEGAL;
+    Expression* retExp = lExpression(context_i);
+    
+    while (TOK_AND == myCurrentToken || TOK_OR == myCurrentToken) {
+        lastToken = myLastToken;
+        myCurrentToken = getNext();
+        Expression* exp = lExpression(context_i);
+        
+        retExp = new LogicalExpression(retExp, exp, lastToken);
+    }
+    return retExp;
+}
+
+
+/*
+ * Function to evaluate in relational expression level in RD parser algorithm
+ */
+Expression* Parser::lExpression(CompilationContext* context_i) {
+    Token lastToken = TOK_ILLEGAL;
+    Expression* retExp = expression(context_i);
+    
+    while (TOK_EQ == myCurrentToken || TOK_NEQ == myCurrentToken ||
+           TOK_GT == myCurrentToken || TOK_GTE == myCurrentToken ||
+           TOK_LT == myCurrentToken || TOK_LTE == myCurrentToken) {
+        lastToken = myCurrentToken;
+        myCurrentToken = getNext();
+        Expression* exp = expression(context_i);
+        RelationalOperator relOp = getRelationalOperator(lastToken);
+        retExp = new RelationalExpression(retExp, exp, relOp);
+    }
+    return retExp;
+}
+
+
+/*
+ * Function to return the relational operator
+ * evaluating the current token
+ */
+RelationalOperator Parser::getRelationalOperator(Token tok_i) {
+    RelationalOperator relOp = REL_OP_ILLEGAL;
+    
+    switch (tok_i) {
+        case TOK_EQ:
+            relOp = REL_OP_EQ;
+            break;
+            
+        case TOK_NEQ:
+            relOp = REL_OP_NEQ;
+            break;
+            
+        case TOK_LT:
+            relOp = REL_OP_LT;
+            break;
+            
+        case TOK_LTE:
+            relOp = REL_OP_LTE;
+            break;
+            
+        case TOK_GT:
+            relOp = REL_OP_GT;
+            break;
+            
+        case TOK_GTE:
+            relOp = REL_OP_GTE;
+            break;
+            
+        default:
+            relOp = REL_OP_ILLEGAL;
+            break;
+    }
+    return relOp;
+}
+
+
+/*
  * Function to evaluate in expression level in RD parser algorithm
  */
 Expression* Parser::expression(CompilationContext* context_i) {
-    Token lastToken = myCurrentToken;
+    Token lastToken = TOK_ILLEGAL;
     Expression* retVal = term(context_i);
     
     while (TOK_PLUS == myCurrentToken || TOK_MINUS == myCurrentToken) {
@@ -164,7 +255,7 @@ Expression* Parser::factor(CompilationContext* context_i) {
         }
         case TOK_OPEN_PAREN: {
             myCurrentToken = getToken();
-            retVal = expression(context_i);
+            retVal = bExpression(context_i);
             
             if (TOK_CLOS_PAREN != myCurrentToken) {
                 exit_with_message("Missing Closing Parenthesis");
@@ -185,6 +276,15 @@ Expression* Parser::factor(CompilationContext* context_i) {
             } else {
                 retVal = new UnaryMinus(retVal);
             }
+            break;
+        }
+        case TOK_NOT:
+        {
+            lastToken = myCurrentToken;
+            getNext();
+            retVal = factor(context_i);
+            
+            retVal = new LogicalNot(retVal);
             break;
         }
         case TOK_UNQUOTED_STRING: {
@@ -215,7 +315,7 @@ Expression* Parser::factor(CompilationContext* context_i) {
  */
 Statement* Parser::parsePrintStatement(CompilationContext* context_i) {
     getNext();
-    Expression* exp = expression(context_i);
+    Expression* exp = bExpression(context_i);
     if (TOK_SEMI != myCurrentToken) {
         exit_with_message("\n; is expected");
     }
@@ -233,7 +333,7 @@ Statement* Parser::parsePrintStatement(CompilationContext* context_i) {
  */
 Statement* Parser::parsePrintLineStatement(CompilationContext* context_i) {
     getNext();
-    Expression* exp = expression(context_i);
+    Expression* exp = bExpression(context_i);
     if (TOK_SEMI != myCurrentToken) {
         exit_with_message(": is expected");
     }
@@ -293,7 +393,7 @@ Statement* Parser::parseAssignmentStatement(CompilationContext* context_i) {
     
     // Skip the token to start the expression
     // parsing on the RHS
-    Expression* exp = expression(context_i);
+    Expression* exp = bExpression(context_i);
     
     // Do the type analysis
 //    if (exp->typeCheck(context_i) != symbol->myType) {
@@ -305,4 +405,57 @@ Statement* Parser::parseAssignmentStatement(CompilationContext* context_i) {
     }
     
     return new AssignmentStatement(symbol, exp);
+}
+
+
+Statement* Parser::parseIfStatement(CompilationContext* context_i) {
+    getNext();
+    Expression* exp = bExpression(context_i);
+    
+    if (TYPE_BOOL != exp->typeCheck(context_i)) {
+        exit_with_message("Expects a boolean expression");
+    }
+    
+    if (TOK_THEN != myCurrentToken) {
+        exit_with_message("Then Expected");
+    }
+    
+    getNext();
+    vector<Statement*> truePart = statementList(context_i);
+    vector<Statement*> falsePart;
+    
+    if( TOK_ENDIF == myCurrentToken) {
+        return new IfStatement(exp, truePart, falsePart);
+    }
+    
+    if (TOK_ELSE != myCurrentToken) {
+        exit_with_message("ELSE expected");
+    }
+    
+    getNext();
+    falsePart = statementList(context_i);
+    if( TOK_ENDIF != myCurrentToken) {
+        exit_with_message("END IF EXPECTED");
+    }
+    
+    return new IfStatement(exp, truePart, falsePart);
+}
+
+
+
+Statement* Parser::parseWhileStatement(CompilationContext* context_i) {
+    getNext();
+    Expression* exp = bExpression(context_i);
+    
+    if (TYPE_BOOL != exp->typeCheck(context_i)) {
+        exit_with_message("Expects a boolean expression");
+    }
+    
+    vector<Statement*> body = statementList(context_i);
+    
+    if (TOK_WEND != myCurrentToken) {
+        exit_with_message("Wend Expected");
+    }
+    
+    return new WhileStatement(exp, body);
 }

@@ -26,8 +26,22 @@ enum Operator {
     OP_DIV
 };
 
+/*
+ * Type to represent Relational 
+ * Operators used in PeteSlang
+ */
+enum RelationalOperator {
+    REL_OP_ILLEGAL = -1,
+    REL_OP_EQ = 1, // '=='
+    REL_OP_NEQ,    // '<>'
+    REL_OP_GT,     // '>'
+    REL_OP_GTE,    // '>='
+    REL_OP_LT,     // '<'
+    REL_OP_LTE     // '<='
+};
+
 // Token count to populate ValueTable
-const int KEYWORD_COUNT = 7;
+const int KEYWORD_COUNT = 13;
 
 /*
  * Tokens in PeteSlang
@@ -58,7 +72,27 @@ enum Token {
     TOK_BOOL_TRUE,  // Boolean TRUE
     TOK_BOOL_FALSE, // Boolean FALSE
     TOK_STRING,     // String Literal
-    TOK_ASSIGN      // Assignment Symbol =
+    TOK_ASSIGN,     // Assignment Symbol =
+    
+    // Added in step 6
+    // For relational & logical operator support
+    TOK_EQ,         // '=='
+    TOK_NEQ,        // '<>'
+    TOK_GT,         // '>'
+    TOK_GTE,        // '>='
+    TOK_LT,         // '<'
+    TOK_LTE,        // '<='
+    TOK_AND,        // '&&'
+    TOK_OR,         // '||'
+    TOK_NOT,        // '!'
+
+    // Control structures support
+    TOK_IF,         // IF
+    TOK_THEN,       // Then
+    TOK_ELSE,       // Else Statement
+    TOK_ENDIF,      // Endif Statement
+    TOK_WHILE,      // WHILE
+    TOK_WEND        // Wend Statement
 };
 
 
@@ -67,7 +101,7 @@ enum Token {
  */
 enum TypeInfo {
     TYPE_ILLEGAL = -1, // NOT A TYPE
-    TYPE_NUMERIC = 1,      // IEEE Double precision floating point
+    TYPE_NUMERIC = 1,  // IEEE Double precision floating point
     TYPE_BOOL,         // Boolean Data type
     TYPE_STRING,       // String data type
 };

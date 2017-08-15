@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/peter/CodeHard/Git/PeteSlang/PeteSlang/Examples/First.sl"
+            argument = "/Users/peter/CodeHard/Git/PeteSlang/PeteSlang/Examples/onetohundred.sl"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
