@@ -1,16 +1,15 @@
 //
-//  Lexer.hpp
+//  Lexer.h
 //  PeteSlang
 //
 //  Created by Peter on 03/05/17.
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#ifndef Lexer_hpp
-#define Lexer_hpp
+#pragma once
 
-#include "AST_Expressions.hpp"
-#include "AST_Statements.hpp"
+#include "AST/Expressions.h"
+#include "AST/Statements.h"
 
 using namespace std;
 
@@ -20,9 +19,9 @@ using namespace std;
 struct ValueTable {
     Token token;
     string value;
-    
+
     ValueTable() {}
-    
+
     ValueTable(Token token_i, string value_i) {
         token = token_i;
         value = value_i;
@@ -36,24 +35,24 @@ struct ValueTable {
  * without decimals can be entered.
  */
 class Lexer {
-    
+
 public:
     Lexer(const string& expr_i);
     virtual ~Lexer();
     Token getToken();
     double getNumber() {return myNumber;}
-    
+
+    Lexer(const Lexer&) = delete;
+    Lexer& operator=(const Lexer&) = delete;
+
 private:
-    Lexer(Lexer& lex_i) {}
-    Lexer& operator=(const Lexer& lex_i) {return *this;}
-    
     void skipToEOL();
-    
+
 protected:
     Token  myCurrentToken; // Current Token
     Token  myLastToken;    // Penultimate token
-    string myLastString;   // Last unquoted string 
-    
+    string myLastString;   // Last unquoted string
+
 private:
     string      myExpr;
     int         myIndex;
@@ -61,5 +60,3 @@ private:
     double      myNumber;
     ValueTable** pmyValTable;
 };
-
-#endif /* Lexer_hpp */

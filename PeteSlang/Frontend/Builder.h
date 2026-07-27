@@ -1,15 +1,15 @@
 //
-//  Builder.hpp
+//  Builder.h
 //  PeteSlang
 //
 //  Created by Peter on 03/05/17.
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#ifndef Builder_hpp
-#define Builder_hpp
+#pragma once
 
-#include "Parser.hpp"
+#include "Frontend/Parser.h"
+#include <memory>
 
 /*
  * Base class for all the Builders
@@ -25,15 +25,11 @@ class ExpressionBuilder : public AbstractBuilder {
 
 public:
     ExpressionBuilder(const string exprStr_i) : myExprString(exprStr_i) {}
-    Expression* getExpression();
-    
-private:
-    ExpressionBuilder(ExpressionBuilder& expBuilder_i) {}
-    ExpressionBuilder& operator=(const ExpressionBuilder& expBuilder_i) {return *this;}
-    
+    std::unique_ptr<Expression> getExpression();
+
+    ExpressionBuilder(const ExpressionBuilder&) = delete;
+    ExpressionBuilder& operator=(const ExpressionBuilder&) = delete;
+
 private:
     string myExprString;
 };
-
-
-#endif /* Builder_hpp */

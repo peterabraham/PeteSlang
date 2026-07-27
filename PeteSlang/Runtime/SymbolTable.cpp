@@ -6,8 +6,8 @@
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#include "SymbolTable.hpp"
-#include "AST_Statements.hpp"
+#include "Runtime/SymbolTable.h"
+#include "AST/Statements.h"
 
 using namespace std;
 
@@ -16,7 +16,7 @@ using namespace std;
  * Ctor of the class SymbolTable
  */
 SymbolTable::SymbolTable() {
-    
+
 }
 
 

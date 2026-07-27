@@ -1,5 +1,5 @@
 //
-//  Common.hpp
+//  Common.h
 //  PeteSlang
 //
 //  Common functions and enums used in PeteSlang.
@@ -8,17 +8,17 @@
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#ifndef Common_hpp
-#define Common_hpp
+#pragma once
 
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <variant>
 
 /*
  * Type to represent Operators used in PeteSlang
  */
-enum Operator {
+enum class Operator {
     OP_ILLEGAL = -1,
     OP_PLUS = 1,
     OP_MINUS,
@@ -27,10 +27,10 @@ enum Operator {
 };
 
 /*
- * Type to represent Relational 
+ * Type to represent Relational
  * Operators used in PeteSlang
  */
-enum RelationalOperator {
+enum class RelationalOperator {
     REL_OP_ILLEGAL = -1,
     REL_OP_EQ = 1, // '=='
     REL_OP_NEQ,    // '<>'
@@ -41,12 +41,12 @@ enum RelationalOperator {
 };
 
 // Token count to populate ValueTable
-const int KEYWORD_COUNT = 13;
+inline constexpr int KEYWORD_COUNT = 13;
 
 /*
  * Tokens in PeteSlang
  */
-enum Token {
+enum class Token {
     TOK_ILLEGAL = -1,
     TOK_PLUS = 1,   // '+'
     TOK_MINUS,      // '-'
@@ -56,13 +56,13 @@ enum Token {
     TOK_CLOS_PAREN, // ')'
     TOK_DOUBLE,     // '('
     TOK_NULL,       // End of string
-    
+
     // Step 3 inclusion
     TOK_PRINT,      // Print Statement
     TOK_PRINTLN,    // PrintLine
     TOK_UNQUOTED_STRING,
     TOK_SEMI,       // ; Semi column
-    
+
     // Step 4 inclusion
     TOK_VAR_NUMBER, // NUMBER data type
     TOK_VAR_STRING, // STRING data type
@@ -73,7 +73,7 @@ enum Token {
     TOK_BOOL_FALSE, // Boolean FALSE
     TOK_STRING,     // String Literal
     TOK_ASSIGN,     // Assignment Symbol =
-    
+
     // Added in step 6
     // For relational & logical operator support
     TOK_EQ,         // '=='
@@ -99,7 +99,7 @@ enum Token {
 /*
  * Type info enumerations
  */
-enum TypeInfo {
+enum class TypeInfo {
     TYPE_ILLEGAL = -1, // NOT A TYPE
     TYPE_NUMERIC = 1,  // IEEE Double precision floating point
     TYPE_BOOL,         // Boolean Data type
@@ -107,22 +107,35 @@ enum TypeInfo {
 };
 
 /*
- * Symbol Table entry for variable using Attributes
+ * Symbol Table entry for variable using Attributes.
+ *
+ * The value used to be three simultaneously-live fields
+ * (myStrVal / myDblVal / myBoolVal), which made it possible to read
+ * the wrong one for myType. It is now a std::variant, so only the
+ * alternative matching myType can ever be alive. getDouble()/getBool()/
+ * getString() throw std::bad_variant_access if you read the wrong
+ * alternative instead of silently returning garbage.
  */
 class SymbolInfo {
 public:
     std::string mySymbolName;
-    TypeInfo    myType;
-    std::string myStrVal;
-    double      myDblVal;
-    bool        myBoolVal;
+    TypeInfo    myType = TypeInfo::TYPE_ILLEGAL;
+    std::variant<double, bool, std::string> myValue;
+
+    double getDouble() const { return std::get<double>(myValue); }
+    bool getBool() const { return std::get<bool>(myValue); }
+    const std::string& getString() const { return std::get<std::string>(myValue); }
+
+    void setDouble(double v) { myValue = v; }
+    void setBool(bool v) { myValue = v; }
+    void setString(std::string v) { myValue = std::move(v); }
 };
 
 
 //
 // Common function declarations
 //
-void exit_with_message(const char *err_msg_i);
+[[noreturn]] void exit_with_message(const char* err_msg_i);
 
 
 /*
@@ -130,7 +143,7 @@ void exit_with_message(const char *err_msg_i);
  */
 template<class T> void safe_delete(T*& pVal_i) {
     delete pVal_i;
-    pVal_i = NULL;
+    pVal_i = nullptr;
 }
 
 
@@ -139,7 +152,7 @@ template<class T> void safe_delete(T*& pVal_i) {
  */
 template<class T> void safe_delete_array(T*& pVal_i) {
     delete[] pVal_i;
-    pVal_i = NULL;
+    pVal_i = nullptr;
 }
 
 
@@ -149,9 +162,7 @@ template<class T> void safe_delete_array(T*& pVal_i) {
 template<class T> void safe_delete_pointer_array(T*& pVal_i, int count_i) {
     for (int idx = 0; idx < count_i; idx++) {
         delete pVal_i[idx];
-        pVal_i[idx] = NULL;
+        pVal_i[idx] = nullptr;
     }
     safe_delete_array(pVal_i);
 }
-
-#endif /* Common_hpp */

@@ -1,13 +1,14 @@
 //
-//  AST.cpp
+//  Expressions.cpp
 //  PeteSlang
 //
 //  Created by Peter on 29/04/17.
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#include "AST_Expressions.hpp"
+#include "AST/Expressions.h"
 #include <math.h>
+#include <utility>
 
 /*
  * Pure virtul dtor of class Expression
@@ -20,18 +21,9 @@ Expression::~Expression() {
  * Ctor of BooleanConstant
  */
 BooleanConstant::BooleanConstant(bool val_i) {
-    pmySymbolInfo = new SymbolInfo();
-    pmySymbolInfo->mySymbolName = "";
-    pmySymbolInfo->myBoolVal    = val_i;
-    pmySymbolInfo->myType       = TYPE_BOOL;
-}
-
-
-/*
- * Dtor of BooleanConstant
- */
-BooleanConstant::~BooleanConstant() {
-    safe_delete(pmySymbolInfo);
+    mySymbolInfo.mySymbolName = "";
+    mySymbolInfo.setBool(val_i);
+    mySymbolInfo.myType       = TypeInfo::TYPE_BOOL;
 }
 
 
@@ -39,7 +31,7 @@ BooleanConstant::~BooleanConstant() {
  * Evaluation of boolean will given the value
  */
 SymbolInfo* BooleanConstant::evaluate(RuntimeContext* context_i) {
-    return pmySymbolInfo;
+    return &mySymbolInfo;
 }
 
 
@@ -47,7 +39,7 @@ SymbolInfo* BooleanConstant::evaluate(RuntimeContext* context_i) {
  * Function to perform type check
  */
 TypeInfo BooleanConstant::typeCheck(CompilationContext* contxt_i) {
-    return pmySymbolInfo->myType;
+    return mySymbolInfo.myType;
 }
 
 
@@ -55,7 +47,7 @@ TypeInfo BooleanConstant::typeCheck(CompilationContext* contxt_i) {
  * Function to get the type
  */
 TypeInfo BooleanConstant::getType() {
-    return pmySymbolInfo->myType;
+    return mySymbolInfo.myType;
 }
 
 
@@ -63,19 +55,10 @@ TypeInfo BooleanConstant::getType() {
 /*
  * Ctor of the class NumericConstant
  */
-NumericConstant::NumericConstant(const double value_i) {
-    pmySymbolInfo = new SymbolInfo();
-    pmySymbolInfo->mySymbolName = "";
-    pmySymbolInfo->myDblVal     = value_i;
-    pmySymbolInfo->myType       = TYPE_NUMERIC;
-}
-
-
-/*
- * Dtor of the class NumericConstant
- */
-NumericConstant::~NumericConstant() {
-    safe_delete(pmySymbolInfo);
+NumericConstant::NumericConstant(double value_i) {
+    mySymbolInfo.mySymbolName = "";
+    mySymbolInfo.setDouble(value_i);
+    mySymbolInfo.myType       = TypeInfo::TYPE_NUMERIC;
 }
 
 
@@ -83,7 +66,7 @@ NumericConstant::~NumericConstant() {
  * Function to evaluate a numeric constant
  */
 SymbolInfo* NumericConstant::evaluate(RuntimeContext* context_i) {
-    return pmySymbolInfo;
+    return &mySymbolInfo;
 }
 
 
@@ -91,7 +74,7 @@ SymbolInfo* NumericConstant::evaluate(RuntimeContext* context_i) {
  * Function to perform type check
  */
 TypeInfo NumericConstant::typeCheck(CompilationContext* contxt_i) {
-    return pmySymbolInfo->myType;
+    return mySymbolInfo.myType;
 }
 
 
@@ -99,7 +82,7 @@ TypeInfo NumericConstant::typeCheck(CompilationContext* contxt_i) {
  * Function to get the type
  */
 TypeInfo NumericConstant::getType() {
-    return pmySymbolInfo->myType;
+    return mySymbolInfo.myType;
 }
 
 
@@ -108,18 +91,9 @@ TypeInfo NumericConstant::getType() {
  * Ctor of the class StringLiteral
  */
 StringLiteral::StringLiteral(std::string val_i) {
-    pmySymbolInfo = new SymbolInfo();
-    pmySymbolInfo->mySymbolName = "";
-    pmySymbolInfo->myStrVal     = val_i;
-    pmySymbolInfo->myType       = TYPE_STRING;
-}
-
-
-/*
- * Dtor of the class StringLiteral
- */
-StringLiteral::~StringLiteral() {
-    safe_delete(pmySymbolInfo);
+    mySymbolInfo.mySymbolName = "";
+    mySymbolInfo.setString(std::move(val_i));
+    mySymbolInfo.myType       = TypeInfo::TYPE_STRING;
 }
 
 
@@ -127,7 +101,7 @@ StringLiteral::~StringLiteral() {
  * Function to evaluate a string literal
  */
 SymbolInfo* StringLiteral::evaluate(RuntimeContext* context_i) {
-    return pmySymbolInfo;
+    return &mySymbolInfo;
 }
 
 
@@ -135,7 +109,7 @@ SymbolInfo* StringLiteral::evaluate(RuntimeContext* context_i) {
  * Function to perform type check
  */
 TypeInfo StringLiteral::typeCheck(CompilationContext* contxt_i) {
-    return pmySymbolInfo->myType;
+    return mySymbolInfo.myType;
 }
 
 
@@ -143,7 +117,7 @@ TypeInfo StringLiteral::typeCheck(CompilationContext* contxt_i) {
  * Function to get the type
  */
 TypeInfo StringLiteral::getType() {
-    return pmySymbolInfo->myType;
+    return mySymbolInfo.myType;
 }
 
 
@@ -163,8 +137,8 @@ Variable::Variable(SymbolInfo* info_i) {
 Variable::Variable(CompilationContext* context_i, std::string name_i, double value_i) {
     SymbolInfo* sInfo = new  SymbolInfo();
     sInfo->mySymbolName = name_i;
-    sInfo->myDblVal     = value_i;
-    myTypeInfo          = TYPE_NUMERIC;
+    sInfo->setDouble(value_i);
+    myTypeInfo          = TypeInfo::TYPE_NUMERIC;
     context_i->addInfo(sInfo);
     myVariableName = name_i;
 }
@@ -176,8 +150,8 @@ Variable::Variable(CompilationContext* context_i, std::string name_i, double val
 Variable::Variable(CompilationContext* context_i, std::string name_i, bool value_i) {
     SymbolInfo* sInfo = new  SymbolInfo();
     sInfo->mySymbolName = name_i;
-    sInfo->myBoolVal    = value_i;
-    myTypeInfo          = TYPE_BOOL;
+    sInfo->setBool(value_i);
+    myTypeInfo          = TypeInfo::TYPE_BOOL;
     context_i->addInfo(sInfo);
     myVariableName = name_i;
 }
@@ -189,17 +163,10 @@ Variable::Variable(CompilationContext* context_i, std::string name_i, bool value
 Variable::Variable(CompilationContext* context_i, std::string name_i, std::string value_i) {
     SymbolInfo* sInfo = new  SymbolInfo();
     sInfo->mySymbolName = name_i;
-    sInfo->myStrVal     = value_i;
-    myTypeInfo          = TYPE_STRING;
+    sInfo->setString(value_i);
+    myTypeInfo          = TypeInfo::TYPE_STRING;
     context_i->addInfo(sInfo);
     myVariableName = name_i;
-}
-
-
-/*
- * Dtor of the class StringLiteral
- */
-Variable::~Variable() {
 }
 
 
@@ -221,11 +188,11 @@ SymbolInfo* Variable::evaluate(RuntimeContext* context_i) {
  * Look up in the Symbol table and return the type info
  */
 TypeInfo Variable::typeCheck(CompilationContext* context_i) {
-    TypeInfo retVal = TYPE_ILLEGAL;
-    
+    TypeInfo retVal = TypeInfo::TYPE_ILLEGAL;
+
     if(nullptr != context_i->getSymbolTable()) {
         SymbolInfo* info = context_i->getInfo(myVariableName);
-        
+
         if(nullptr != info) {
             myTypeInfo = info->myType;
             retVal = myTypeInfo;
@@ -236,7 +203,7 @@ TypeInfo Variable::typeCheck(CompilationContext* context_i) {
 
 
 /*
- * This function should only be called after the 
+ * This function should only be called after the
  * TypeCheck method has been invoked on AST.
  */
 TypeInfo Variable::getType() {
@@ -248,17 +215,9 @@ TypeInfo Variable::getType() {
 /*
  * Ctor of the class BinaryPlus
  */
-BinaryPlus::BinaryPlus(Expression* exp1_i, Expression* exp2_i) : pmyExp1(exp1_i),
-                                                                 pmyExp2(exp2_i)
+BinaryPlus::BinaryPlus(std::unique_ptr<Expression> exp1_i, std::unique_ptr<Expression> exp2_i) : pmyExp1(std::move(exp1_i)),
+                                                                 pmyExp2(std::move(exp2_i))
 {
-}
-
-
-/*
- * Dtor of the class BinaryPlus
- */
-BinaryPlus::~BinaryPlus() {
-    
 }
 
 
@@ -269,21 +228,21 @@ SymbolInfo* BinaryPlus::evaluate(RuntimeContext* context_i) {
     SymbolInfo* evaluateLeft = pmyExp1->evaluate(context_i);
     SymbolInfo* evaluateRight = pmyExp2->evaluate(context_i);
     SymbolInfo* retVal = nullptr;
-    
-    if(TYPE_STRING == evaluateLeft->myType && TYPE_STRING == evaluateRight->myType) {
+
+    if(TypeInfo::TYPE_STRING == evaluateLeft->myType && TypeInfo::TYPE_STRING == evaluateRight->myType) {
         retVal = new SymbolInfo();
-        retVal->myStrVal     = evaluateLeft->myStrVal + evaluateRight->myStrVal;
-        retVal->myType       = TYPE_STRING;
+        retVal->setString(evaluateLeft->getString() + evaluateRight->getString());
+        retVal->myType       = TypeInfo::TYPE_STRING;
         retVal->mySymbolName = "";
-    } else if (TYPE_NUMERIC == evaluateLeft->myType && TYPE_NUMERIC == evaluateRight->myType) {
+    } else if (TypeInfo::TYPE_NUMERIC == evaluateLeft->myType && TypeInfo::TYPE_NUMERIC == evaluateRight->myType) {
         retVal = new SymbolInfo();
-        retVal->myDblVal     = evaluateLeft->myDblVal + evaluateRight->myDblVal;
-        retVal->myType       = TYPE_NUMERIC;
+        retVal->setDouble(evaluateLeft->getDouble() + evaluateRight->getDouble());
+        retVal->myType       = TypeInfo::TYPE_NUMERIC;
         retVal->mySymbolName = "";
     } else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -294,15 +253,15 @@ SymbolInfo* BinaryPlus::evaluate(RuntimeContext* context_i) {
 TypeInfo BinaryPlus::typeCheck(CompilationContext* context_i) {
     TypeInfo evaluateLeft  = pmyExp1->typeCheck(context_i);
     TypeInfo evaluateRight = pmyExp2->typeCheck(context_i);
-    TypeInfo retVal        = TYPE_ILLEGAL;
-    
-    if (TYPE_BOOL != evaluateLeft && TYPE_BOOL != evaluateRight) {
+    TypeInfo retVal        = TypeInfo::TYPE_ILLEGAL;
+
+    if (TypeInfo::TYPE_BOOL != evaluateLeft && TypeInfo::TYPE_BOOL != evaluateRight) {
         myTypeInfo = evaluateLeft;
         retVal     = evaluateLeft;
     }  else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -319,17 +278,9 @@ TypeInfo BinaryPlus::getType() {
 /*
  * Ctor of the class BinaryMinus
  */
-BinaryMinus::BinaryMinus(Expression* exp1_i, Expression* exp2_i) : pmyExp1(exp1_i),
-                                                                   pmyExp2(exp2_i)
+BinaryMinus::BinaryMinus(std::unique_ptr<Expression> exp1_i, std::unique_ptr<Expression> exp2_i) : pmyExp1(std::move(exp1_i)),
+                                                                   pmyExp2(std::move(exp2_i))
 {
-}
-
-
-/*
- * Dtor of the class BinaryMinus
- */
-BinaryMinus::~BinaryMinus() {
-    
 }
 
 
@@ -340,16 +291,16 @@ SymbolInfo* BinaryMinus::evaluate(RuntimeContext* context_i) {
     SymbolInfo* evaluateLeft = pmyExp1->evaluate(context_i);
     SymbolInfo* evaluateRight = pmyExp2->evaluate(context_i);
     SymbolInfo* retVal = nullptr;
-    
-    if (TYPE_NUMERIC == evaluateLeft->myType && TYPE_NUMERIC == evaluateRight->myType) {
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateLeft->myType && TypeInfo::TYPE_NUMERIC == evaluateRight->myType) {
         retVal = new SymbolInfo();
-        retVal->myDblVal     = evaluateLeft->myDblVal - evaluateRight->myDblVal;
-        retVal->myType       = TYPE_NUMERIC;
+        retVal->setDouble(evaluateLeft->getDouble() - evaluateRight->getDouble());
+        retVal->myType       = TypeInfo::TYPE_NUMERIC;
         retVal->mySymbolName = "";
     } else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -360,15 +311,15 @@ SymbolInfo* BinaryMinus::evaluate(RuntimeContext* context_i) {
 TypeInfo BinaryMinus::typeCheck(CompilationContext* context_i) {
     TypeInfo evaluateLeft  = pmyExp1->typeCheck(context_i);
     TypeInfo evaluateRight = pmyExp2->typeCheck(context_i);
-    TypeInfo retVal        = TYPE_ILLEGAL;
-    
-    if (TYPE_NUMERIC == evaluateLeft && TYPE_NUMERIC == evaluateRight) {
+    TypeInfo retVal        = TypeInfo::TYPE_ILLEGAL;
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateLeft && TypeInfo::TYPE_NUMERIC == evaluateRight) {
         myTypeInfo = evaluateLeft;
         retVal     = evaluateLeft;
     }  else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -385,17 +336,9 @@ TypeInfo BinaryMinus::getType() {
 /*
  * Ctor of the class Multiply
  */
-Multiply::Multiply(Expression* exp1_i, Expression* exp2_i) : pmyExp1(exp1_i),
-pmyExp2(exp2_i)
+Multiply::Multiply(std::unique_ptr<Expression> exp1_i, std::unique_ptr<Expression> exp2_i) : pmyExp1(std::move(exp1_i)),
+pmyExp2(std::move(exp2_i))
 {
-}
-
-
-/*
- * Dtor of the class Multiply
- */
-Multiply::~Multiply() {
-    
 }
 
 
@@ -406,16 +349,16 @@ SymbolInfo* Multiply::evaluate(RuntimeContext* context_i) {
     SymbolInfo* evaluateLeft = pmyExp1->evaluate(context_i);
     SymbolInfo* evaluateRight = pmyExp2->evaluate(context_i);
     SymbolInfo* retVal = nullptr;
-    
-    if (TYPE_NUMERIC == evaluateLeft->myType && TYPE_NUMERIC == evaluateRight->myType) {
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateLeft->myType && TypeInfo::TYPE_NUMERIC == evaluateRight->myType) {
         retVal = new SymbolInfo();
-        retVal->myDblVal     = evaluateLeft->myDblVal * evaluateRight->myDblVal;
-        retVal->myType       = TYPE_NUMERIC;
+        retVal->setDouble(evaluateLeft->getDouble() * evaluateRight->getDouble());
+        retVal->myType       = TypeInfo::TYPE_NUMERIC;
         retVal->mySymbolName = "";
     } else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -426,15 +369,15 @@ SymbolInfo* Multiply::evaluate(RuntimeContext* context_i) {
 TypeInfo Multiply::typeCheck(CompilationContext* context_i) {
     TypeInfo evaluateLeft  = pmyExp1->typeCheck(context_i);
     TypeInfo evaluateRight = pmyExp2->typeCheck(context_i);
-    TypeInfo retVal        = TYPE_ILLEGAL;
-    
-    if (TYPE_NUMERIC == evaluateLeft && TYPE_NUMERIC == evaluateRight) {
+    TypeInfo retVal        = TypeInfo::TYPE_ILLEGAL;
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateLeft && TypeInfo::TYPE_NUMERIC == evaluateRight) {
         myTypeInfo = evaluateLeft;
         retVal     = evaluateLeft;
     }  else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -452,17 +395,9 @@ TypeInfo Multiply::getType() {
 /*
  * Ctor of the class Divide
  */
-Divide::Divide(Expression* exp1_i, Expression* exp2_i) : pmyExp1(exp1_i),
-pmyExp2(exp2_i)
+Divide::Divide(std::unique_ptr<Expression> exp1_i, std::unique_ptr<Expression> exp2_i) : pmyExp1(std::move(exp1_i)),
+pmyExp2(std::move(exp2_i))
 {
-}
-
-
-/*
- * Dtor of the class Divide
- */
-Divide::~Divide() {
-    
 }
 
 
@@ -473,16 +408,16 @@ SymbolInfo* Divide::evaluate(RuntimeContext* context_i) {
     SymbolInfo* evaluateLeft = pmyExp1->evaluate(context_i);
     SymbolInfo* evaluateRight = pmyExp2->evaluate(context_i);
     SymbolInfo* retVal = nullptr;
-    
-    if (TYPE_NUMERIC == evaluateLeft->myType && TYPE_NUMERIC == evaluateRight->myType) {
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateLeft->myType && TypeInfo::TYPE_NUMERIC == evaluateRight->myType) {
         retVal = new SymbolInfo();
-        retVal->myDblVal     = evaluateLeft->myDblVal / evaluateRight->myDblVal;
-        retVal->myType       = TYPE_NUMERIC;
+        retVal->setDouble(evaluateLeft->getDouble() / evaluateRight->getDouble());
+        retVal->myType       = TypeInfo::TYPE_NUMERIC;
         retVal->mySymbolName = "";
     } else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -493,15 +428,15 @@ SymbolInfo* Divide::evaluate(RuntimeContext* context_i) {
 TypeInfo Divide::typeCheck(CompilationContext* context_i) {
     TypeInfo evaluateLeft  = pmyExp1->typeCheck(context_i);
     TypeInfo evaluateRight = pmyExp2->typeCheck(context_i);
-    TypeInfo retVal        = TYPE_ILLEGAL;
-    
-    if (TYPE_NUMERIC == evaluateLeft && TYPE_NUMERIC == evaluateRight) {
+    TypeInfo retVal        = TypeInfo::TYPE_ILLEGAL;
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateLeft && TypeInfo::TYPE_NUMERIC == evaluateRight) {
         myTypeInfo = evaluateLeft;
         retVal     = evaluateLeft;
     }  else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -518,15 +453,7 @@ TypeInfo Divide::getType() {
 /*
  * Ctor of the class UnaryPlus
  */
-UnaryPlus::UnaryPlus(Expression* exp_i) : pmyExp(exp_i) {
-}
-
-
-/*
- * Dtor of the class UnaryPlus
- */
-UnaryPlus::~UnaryPlus() {
-    
+UnaryPlus::UnaryPlus(std::unique_ptr<Expression> exp_i) : pmyExp(std::move(exp_i)) {
 }
 
 
@@ -536,16 +463,16 @@ UnaryPlus::~UnaryPlus() {
 SymbolInfo* UnaryPlus::evaluate(RuntimeContext* context_i) {
     SymbolInfo* evaluateVal = pmyExp->evaluate(context_i);
     SymbolInfo* retVal = nullptr;
-    
-    if (TYPE_NUMERIC == evaluateVal->myType) {
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateVal->myType) {
         retVal = new SymbolInfo();
-        retVal->myDblVal     = evaluateVal->myDblVal;
-        retVal->myType       = TYPE_NUMERIC;
+        retVal->setDouble(evaluateVal->getDouble());
+        retVal->myType       = TypeInfo::TYPE_NUMERIC;
         retVal->mySymbolName = "";
     } else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -555,15 +482,15 @@ SymbolInfo* UnaryPlus::evaluate(RuntimeContext* context_i) {
  */
 TypeInfo UnaryPlus::typeCheck(CompilationContext* context_i) {
     TypeInfo evaluateVal  = pmyExp->typeCheck(context_i);
-    TypeInfo retVal        = TYPE_ILLEGAL;
-    
-    if (TYPE_NUMERIC == evaluateVal) {
+    TypeInfo retVal        = TypeInfo::TYPE_ILLEGAL;
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateVal) {
         myTypeInfo = evaluateVal;
         retVal     = evaluateVal;
     }  else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -580,15 +507,7 @@ TypeInfo UnaryPlus::getType() {
 /*
  * Ctor of the class UnaryMinus
  */
-UnaryMinus::UnaryMinus(Expression* exp_i) : pmyExp(exp_i) {
-}
-
-
-/*
- * Dtor of the class UnaryMinus
- */
-UnaryMinus::~UnaryMinus() {
-    
+UnaryMinus::UnaryMinus(std::unique_ptr<Expression> exp_i) : pmyExp(std::move(exp_i)) {
 }
 
 
@@ -598,16 +517,16 @@ UnaryMinus::~UnaryMinus() {
 SymbolInfo* UnaryMinus::evaluate(RuntimeContext* context_i) {
     SymbolInfo* evaluateVal = pmyExp->evaluate(context_i);
     SymbolInfo* retVal = nullptr;
-    
-    if (TYPE_NUMERIC == evaluateVal->myType) {
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateVal->myType) {
         retVal = new SymbolInfo();
-        retVal->myDblVal     = -evaluateVal->myDblVal;
-        retVal->myType       = TYPE_NUMERIC;
+        retVal->setDouble(-evaluateVal->getDouble());
+        retVal->myType       = TypeInfo::TYPE_NUMERIC;
         retVal->mySymbolName = "";
     } else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -617,15 +536,15 @@ SymbolInfo* UnaryMinus::evaluate(RuntimeContext* context_i) {
  */
 TypeInfo UnaryMinus::typeCheck(CompilationContext* context_i) {
     TypeInfo evaluateVal  = pmyExp->typeCheck(context_i);
-    TypeInfo retVal        = TYPE_ILLEGAL;
-    
-    if (TYPE_NUMERIC == evaluateVal) {
+    TypeInfo retVal        = TypeInfo::TYPE_ILLEGAL;
+
+    if (TypeInfo::TYPE_NUMERIC == evaluateVal) {
         myTypeInfo = evaluateVal;
         retVal     = evaluateVal;
     }  else {
         exit_with_message("Type mismatch");
     }
-    
+
     return retVal;
 }
 
@@ -642,18 +561,11 @@ TypeInfo UnaryMinus::getType() {
 /*
  * Ctor of the class RelationalExpression
  */
-RelationalExpression::RelationalExpression(Expression* exp1_i,
-                                           Expression* exp2_i,
-                                           RelationalOperator opearator_i) : pmyExp1(exp1_i),
-                                                                             pmyExp2(exp2_i),
+RelationalExpression::RelationalExpression(std::unique_ptr<Expression> exp1_i,
+                                           std::unique_ptr<Expression> exp2_i,
+                                           RelationalOperator opearator_i) : pmyExp1(std::move(exp1_i)),
+                                                                             pmyExp2(std::move(exp2_i)),
                                                                              myOperator(opearator_i) {
-}
-
-
-/*
- * Dtor of the class RelationalExpression
- */
-RelationalExpression::~RelationalExpression() {
 }
 
 
@@ -663,63 +575,63 @@ RelationalExpression::~RelationalExpression() {
 SymbolInfo* RelationalExpression::evaluate(RuntimeContext* context_i) {
     SymbolInfo* leftInfo  = pmyExp1->evaluate(context_i);
     SymbolInfo* rightInfo = pmyExp2->evaluate(context_i);
-    
+
     if (leftInfo->myType != rightInfo->myType) {
         return nullptr;
     }
-    
+
     SymbolInfo* pRetSymbol = new SymbolInfo();
-    pRetSymbol->myType = TYPE_BOOL;
+    pRetSymbol->myType = TypeInfo::TYPE_BOOL;
     pRetSymbol->mySymbolName = "";
-    
+
     switch (leftInfo->myType) {
-        case TYPE_NUMERIC: {
-            if (myOperator == REL_OP_EQ) {
-                pRetSymbol->myBoolVal = leftInfo->myDblVal == rightInfo->myDblVal;
-            } else if (myOperator == REL_OP_NEQ) {
-                pRetSymbol->myBoolVal = leftInfo->myDblVal != rightInfo->myDblVal;
-            } else if (myOperator == REL_OP_GT) {
-                pRetSymbol->myBoolVal = leftInfo->myDblVal > rightInfo->myDblVal;
-            } else if (myOperator == REL_OP_LT) {
-                pRetSymbol->myBoolVal = leftInfo->myDblVal < rightInfo->myDblVal;
-            } else if (myOperator == REL_OP_GTE) {
-                pRetSymbol->myBoolVal = leftInfo->myDblVal >= rightInfo->myDblVal;
-            } else if (myOperator == REL_OP_LTE) {
-                pRetSymbol->myBoolVal = leftInfo->myDblVal <= rightInfo->myDblVal;
+        case TypeInfo::TYPE_NUMERIC: {
+            if (myOperator == RelationalOperator::REL_OP_EQ) {
+                pRetSymbol->setBool(leftInfo->getDouble() == rightInfo->getDouble());
+            } else if (myOperator == RelationalOperator::REL_OP_NEQ) {
+                pRetSymbol->setBool(leftInfo->getDouble() != rightInfo->getDouble());
+            } else if (myOperator == RelationalOperator::REL_OP_GT) {
+                pRetSymbol->setBool(leftInfo->getDouble() > rightInfo->getDouble());
+            } else if (myOperator == RelationalOperator::REL_OP_LT) {
+                pRetSymbol->setBool(leftInfo->getDouble() < rightInfo->getDouble());
+            } else if (myOperator == RelationalOperator::REL_OP_GTE) {
+                pRetSymbol->setBool(leftInfo->getDouble() >= rightInfo->getDouble());
+            } else if (myOperator == RelationalOperator::REL_OP_LTE) {
+                pRetSymbol->setBool(leftInfo->getDouble() <= rightInfo->getDouble());
             } else {
-                pRetSymbol->myBoolVal = false;
+                pRetSymbol->setBool(false);
             }
             break;
         }
-        
-        case TYPE_STRING:{
-            if (myOperator == REL_OP_EQ) {
-                pRetSymbol->myBoolVal = (0 == leftInfo->myStrVal.compare(rightInfo->myStrVal));
-            } else if (myOperator == REL_OP_NEQ) {
-                pRetSymbol->myBoolVal = (0 != leftInfo->myStrVal.compare(rightInfo->myStrVal));
+
+        case TypeInfo::TYPE_STRING:{
+            if (myOperator == RelationalOperator::REL_OP_EQ) {
+                pRetSymbol->setBool(0 == leftInfo->getString().compare(rightInfo->getString()));
+            } else if (myOperator == RelationalOperator::REL_OP_NEQ) {
+                pRetSymbol->setBool(0 != leftInfo->getString().compare(rightInfo->getString()));
             } else {
-                pRetSymbol->myBoolVal = false;
+                pRetSymbol->setBool(false);
             }
             break;
         }
-            
-        case TYPE_BOOL: {
-            if (myOperator == REL_OP_EQ) {
-                pRetSymbol->myBoolVal = leftInfo->myBoolVal == rightInfo->myBoolVal;
-            } else if (myOperator == REL_OP_NEQ) {
-                pRetSymbol->myBoolVal = leftInfo->myBoolVal != rightInfo->myBoolVal;
+
+        case TypeInfo::TYPE_BOOL: {
+            if (myOperator == RelationalOperator::REL_OP_EQ) {
+                pRetSymbol->setBool(leftInfo->getBool() == rightInfo->getBool());
+            } else if (myOperator == RelationalOperator::REL_OP_NEQ) {
+                pRetSymbol->setBool(leftInfo->getBool() != rightInfo->getBool());
             } else {
-                pRetSymbol->myBoolVal = false;
+                pRetSymbol->setBool(false);
             }
             break;
         }
-            
+
         default: {
             safe_delete(pRetSymbol);
             return nullptr;
         }
     }
-    
+
     return pRetSymbol;
 }
 
@@ -730,22 +642,22 @@ SymbolInfo* RelationalExpression::evaluate(RuntimeContext* context_i) {
 TypeInfo RelationalExpression::typeCheck(CompilationContext* contxt_i) {
     TypeInfo leftInfo  = pmyExp1->typeCheck(contxt_i);
     TypeInfo rightInfo = pmyExp2->typeCheck(contxt_i);
-    
+
     if (leftInfo != rightInfo) {
         exit_with_message("Wrong Type in expression");
     }
-    
-    if (leftInfo == TYPE_STRING && !(REL_OP_EQ == myOperator || REL_OP_NEQ == myOperator)) {
+
+    if (leftInfo == TypeInfo::TYPE_STRING && !(RelationalOperator::REL_OP_EQ == myOperator || RelationalOperator::REL_OP_NEQ == myOperator)) {
         exit_with_message("Only == amd != supported for string type ");
     }
-    
-    if (leftInfo == TYPE_BOOL && !(REL_OP_EQ == myOperator || REL_OP_NEQ == myOperator)) {
+
+    if (leftInfo == TypeInfo::TYPE_BOOL && !(RelationalOperator::REL_OP_EQ == myOperator || RelationalOperator::REL_OP_NEQ == myOperator)) {
         exit_with_message("Only == amd != supported for bool type ");
     }
-    
+
     myOperandsType = leftInfo;
-    myNodeType = TYPE_BOOL;
-    
+    myNodeType = TypeInfo::TYPE_BOOL;
+
     return myNodeType;
 }
 
@@ -762,18 +674,11 @@ TypeInfo RelationalExpression::getType() {
 /*
  * Ctor of the class LogicalExpression
  */
-LogicalExpression::LogicalExpression(Expression* exp1_i,
-                                     Expression* exp2_i,
-                                     Token opearator_i) : pmyExp1(exp1_i),
-                                                          pmyExp2(exp2_i),
+LogicalExpression::LogicalExpression(std::unique_ptr<Expression> exp1_i,
+                                     std::unique_ptr<Expression> exp2_i,
+                                     Token opearator_i) : pmyExp1(std::move(exp1_i)),
+                                                          pmyExp2(std::move(exp2_i)),
                                                           myOperator(opearator_i) {
-}
-
-
-/*
- * Dtor of the class LogicalExpression
- */
-LogicalExpression::~LogicalExpression() {
 }
 
 
@@ -783,24 +688,24 @@ LogicalExpression::~LogicalExpression() {
 SymbolInfo* LogicalExpression::evaluate(RuntimeContext* context_i) {
     SymbolInfo* leftInfo  = pmyExp1->evaluate(context_i);
     SymbolInfo* rightInfo = pmyExp2->evaluate(context_i);
-    
+
     if ((leftInfo->myType != rightInfo->myType) &&
-        (TYPE_BOOL != leftInfo->myType)) {
+        (TypeInfo::TYPE_BOOL != leftInfo->myType)) {
         return nullptr;
     }
-    
+
     SymbolInfo* pRetSymbol = new SymbolInfo();
-    pRetSymbol->myType = TYPE_BOOL;
+    pRetSymbol->myType = TypeInfo::TYPE_BOOL;
     pRetSymbol->mySymbolName = "";
-    
-    if (TOK_AND == myOperator) {
-        pRetSymbol->myBoolVal = (leftInfo->myBoolVal && rightInfo->myBoolVal);
-    } else if (TOK_OR == myOperator) {
-        pRetSymbol->myBoolVal = (leftInfo->myBoolVal || rightInfo->myBoolVal);
+
+    if (Token::TOK_AND == myOperator) {
+        pRetSymbol->setBool(leftInfo->getBool() && rightInfo->getBool());
+    } else if (Token::TOK_OR == myOperator) {
+        pRetSymbol->setBool(leftInfo->getBool() || rightInfo->getBool());
     } else {
-        pRetSymbol->myBoolVal = false;
+        pRetSymbol->setBool(false);
     }
-    
+
     return pRetSymbol;
 }
 
@@ -811,13 +716,13 @@ SymbolInfo* LogicalExpression::evaluate(RuntimeContext* context_i) {
 TypeInfo LogicalExpression::typeCheck(CompilationContext* contxt_i) {
     TypeInfo leftInfo  = pmyExp1->typeCheck(contxt_i);
     TypeInfo rightInfo = pmyExp2->typeCheck(contxt_i);
-    
-    if ((leftInfo == rightInfo) && (leftInfo == TYPE_BOOL)) {
-        myNodeType = TYPE_BOOL;
+
+    if ((leftInfo == rightInfo) && (leftInfo == TypeInfo::TYPE_BOOL)) {
+        myNodeType = TypeInfo::TYPE_BOOL;
     } else {
         exit_with_message("Wrong Type in expression");
     }
-    
+
     return myNodeType;
 }
 
@@ -836,12 +741,12 @@ TypeInfo LogicalExpression::getType() {
  */
 SymbolInfo* LogicalNot::evaluate(RuntimeContext* context_i) {
     SymbolInfo* leftInfo  = pmyExp->evaluate(context_i);
-    
-    if (TYPE_BOOL == leftInfo->myType) {
+
+    if (TypeInfo::TYPE_BOOL == leftInfo->myType) {
         SymbolInfo* pRetSymbol = new SymbolInfo();
-        pRetSymbol->myType = TYPE_BOOL;
+        pRetSymbol->myType = TypeInfo::TYPE_BOOL;
         pRetSymbol->mySymbolName = "";
-        pRetSymbol->myBoolVal = !leftInfo->myBoolVal;
+        pRetSymbol->setBool(!leftInfo->getBool());
         return pRetSymbol;
     }
     return nullptr;
@@ -853,12 +758,12 @@ SymbolInfo* LogicalNot::evaluate(RuntimeContext* context_i) {
  */
 TypeInfo LogicalNot::typeCheck(CompilationContext* contxt_i) {
     TypeInfo leftInfo = pmyExp->typeCheck(contxt_i);
-    
-    if (TYPE_BOOL != leftInfo) {
+
+    if (TypeInfo::TYPE_BOOL != leftInfo) {
         exit_with_message("Wrong Type in expression");
     }
-    myNodeType = TYPE_BOOL;
-    
+    myNodeType = TypeInfo::TYPE_BOOL;
+
     return myNodeType;
 }
 

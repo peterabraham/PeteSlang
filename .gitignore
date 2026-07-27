@@ -1,0 +1,12 @@
+# CMake build output (any generator: Ninja, Makefiles, Visual Studio, Xcode, ...)
+build/
+build-*/
+out/
+
+# Xcode project — no longer tracked; CMake (`cmake -G Xcode`) regenerates it locally
+PeteSlang.xcodeproj/
+DerivedData/
+
+# macOS
+.DS_Store
+testfile_outside.txt

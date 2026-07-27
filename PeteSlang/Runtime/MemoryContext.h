@@ -1,21 +1,20 @@
 //
-//  RuntimeContext.hpp
+//  MemoryContext.h
 //  PeteSlang
 //
 //  Created by Peter on 29/04/17.
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#ifndef MemoryContext_hpp
-#define MemoryContext_hpp
+#pragma once
 
-#include "SymbolTable.hpp"
+#include "Runtime/SymbolTable.h"
 
 /*
  * A Context is necessary for Variable scope
  */
 class RuntimeContext {
-    
+
 public:
     RuntimeContext();
     ~RuntimeContext();
@@ -24,7 +23,7 @@ public:
     void addInfo(SymbolInfo* info_i);
     void assignInfo(Variable* var_i, SymbolInfo* info_i);
     void setSymbolTable(SymbolTable* table_i);
-    
+
 private:
     SymbolTable* mySymbolTable;
 };
@@ -41,9 +40,7 @@ public:
     void addInfo(SymbolInfo* info_i);
     void assignInfo(Variable* var_i, SymbolInfo* info_i);
     void setSymbolTable(SymbolTable* table_i);
-    
+
 private:
     SymbolTable* mySymbolTable;
 };
-
-#endif /* MemoryContext_hpp */

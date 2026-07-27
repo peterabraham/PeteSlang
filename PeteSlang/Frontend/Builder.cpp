@@ -6,22 +6,22 @@
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#include "Builder.hpp"
-
+#include "Frontend/Builder.h"
+#include <memory>
 
 /*
  * Function to return Expression from the Expression builder.
  */
-Expression* ExpressionBuilder::getExpression() {
-    
-    Parser* parser = NULL;
-    
+std::unique_ptr<Expression> ExpressionBuilder::getExpression() {
+
+    std::unique_ptr<Parser> parser;
+
     try {
-        parser = new Parser(myExprString);
+        parser = std::make_unique<Parser>(myExprString);
     }
     catch(...) {
         exit_with_message("Unhandled excpetion occured");
     }
-    
+
     return nullptr;//parser->callExpression();
 }

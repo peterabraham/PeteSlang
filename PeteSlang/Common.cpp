@@ -6,13 +6,14 @@
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#include "Common.hpp"
+#include "Common.h"
+#include <cstdlib>
 
 /*
  * Quits process , shows error message
  */
 void exit_with_message(const char* errMsg_i) {
-    
+
     std::cout << "\n" << errMsg_i << "\n";
     exit(0);
 }

@@ -1,13 +1,13 @@
 //
-//  RuntimeContext.cpp
+//  MemoryContext.cpp
 //  PeteSlang
 //
 //  Created by Peter on 29/04/17.
 //  Copyright © 2017 Peter. All rights reserved.
 //
 
-#include "MemoryContext.hpp"
-#include "Common.hpp"
+#include "Runtime/MemoryContext.h"
+#include "Common.h"
 
 /*
  * Ctor of the class RuntimeContext
@@ -42,7 +42,7 @@ void RuntimeContext::setSymbolTable(SymbolTable* table_i) {
 
 
 /*
- * Function to retrieve the symbol info 
+ * Function to retrieve the symbol info
  * of input argument variable.
  */
 SymbolInfo* RuntimeContext::getInfo(std::string varName_i) {
@@ -59,7 +59,7 @@ void RuntimeContext::addInfo(SymbolInfo* info_i) {
 
 
 /*
- * Function to assign symbol info to an 
+ * Function to assign symbol info to an
  * existing variable in symbol table
  */
 void RuntimeContext::assignInfo(Variable* var_i, SymbolInfo* info_i) {
@@ -92,7 +92,7 @@ SymbolTable* CompilationContext::getSymbolTable() {
 
 
 /*
- * Function to retrieve the symbol 
+ * Function to retrieve the symbol
  * info of input argument variable.
  */
 SymbolInfo* CompilationContext::getInfo(std::string varName_i) {
