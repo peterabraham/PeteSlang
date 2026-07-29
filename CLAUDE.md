@@ -21,11 +21,33 @@ Currently implemented: arithmetic expressions, PRINT/PRINTLINE statements, typed
 assignment, relational/logical operators, and IF/WHILE control flow. Not yet implemented: user-defined
 functions.
 
+`SPEC.md` (repo root) is the project's roadmap and contract — sequencing, language decisions still to be
+made, testing strategy, and a running log of known defects all live there. Treat it as the source of truth
+for scope; this file stays focused on architecture/build/run mechanics. The project is MIT-licensed (see
+`LICENSE`).
+
+### Known current defects
+
+Verified against the code as of 2026-07-29 (see `SPEC.md` for the fix/test plan):
+
+- `IfStatement::execute` and `WhileStatement::execute` (`AST/Statements.cpp`) each destroy their own
+  statement-body vector on exit (`IfStatement` even does it twice, on `myStatements` both times, clearing
+  the same vector rather than `myElsePart`) — a body currently only survives one execution.
+- Both of those also dereference their condition's `SymbolInfo*` even when it's null
+  (`nullptr == pRetSymbol && TYPE_BOOL != pRetSymbol->myType` should be `||`, or an early return).
+- `SymbolTable::get` dereferences `map::find()`'s result without checking `end()` — an undeclared/misspelled
+  variable name is UB, not a diagnostic.
+- `SymbolTable::add` silently no-ops on a duplicate key (`map::insert` keeps the first declaration).
+- `ExpressionBuilder::getExpression()` (`Frontend/Builder.cpp`) always returns `nullptr` — the actual
+  `parser->callExpression(...)` call is commented out, so this standalone helper is currently non-functional.
+
 ## Build
 
-CMake (`CMakeLists.txt` at the repo root) is the only build system for this repo — it compiles
-`PeteSlang/*.cpp` into a single `peteslang` executable. Targets C++17, no dependencies beyond the standard
-library. Builds with GCC, Clang, and MSVC.
+CMake (`CMakeLists.txt` at the repo root, minimum version 3.20) is the only build system for this repo. It
+compiles `PeteSlang/*.cpp` (excluding `main.cpp`) into a `peteslang_core` static library, then links a
+separate `peteslang` executable against it from just `main.cpp` — the split exists so `Tests/` can link
+`peteslang_core` directly without a second `main()`. Targets C++17, no dependencies beyond the standard
+library for the core/executable. Builds with GCC, Clang, and MSVC.
 
 ```bash
 cmake -S . -B build
@@ -35,8 +57,12 @@ cmake --build build
 The binary is produced at `build/peteslang`.
 
 Native IDE projects (Xcode, Visual Studio, ...) can be generated on demand with `cmake -G <generator>` and
-are gitignored — don't hand-edit or commit them; edit `CMakeLists.txt` instead. There is no test suite,
-linter, or CI config in this repo.
+are gitignored — don't hand-edit or commit them; edit `CMakeLists.txt` instead. There is no linter or CI
+config in this repo.
+
+A GoogleTest suite lives under `Tests/` (fetched via CMake `FetchContent`, run through CTest — see
+`SPEC.md`'s Testing section for commands). Only a smoke test exists so far; it exists to prove the harness
+itself works, not to cover the language.
 
 ## Running
 

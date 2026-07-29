@@ -11,8 +11,12 @@ current C++.
 Architecturally it's a classic hand-rolled recursive-descent interpreter: a combined lexer/parser reads the
 source text and builds an AST directly (there's no separate parse tree), and the AST nodes evaluate/execute
 themselves via virtual dispatch (a tree-walking interpreter, not a bytecode VM). The long-term goal is to grow
-PeteSlang past "interpreter" into a real compiler with LLVM and GCC-based code generation backends — see
-[Roadmap](#roadmap) below.
+PeteSlang past "interpreter" into a real compiler with a C++ source-generation backend (compiled through a
+configurable host compiler) and, later, LLVM — see [Roadmap](#roadmap) below.
+
+The ebook is treated as inspiration rather than a strict compatibility target: PeteSlang is free to make its
+own language and architecture decisions where they diverge. See [`SPEC.md`](./SPEC.md) for the full
+specification, roadmap, and a running log of known defects.
 
 ## Language at a glance
 
@@ -62,6 +66,28 @@ The interpreter takes a script file path as its only argument:
 build/peteslang Examples/onetohundred.sl
 ```
 
+Swap in any other file under `Examples/` (or your own `.sl` script) as the argument.
+
+## Testing
+
+GoogleTest + CTest, wired through the normal CMake build:
+
+```bash
+cmake -S . -B build -DBUILD_TESTING=ON
+cmake --build build
+ctest --test-dir build --output-on-failure
+```
+
+The first configure needs internet access — `Tests/CMakeLists.txt` fetches GoogleTest from GitHub via CMake's
+`FetchContent`. It's cached under `build/_deps` afterward, so later builds don't re-fetch it.
+
+If you have a `build/` directory from before the CMake restructuring (single `peteslang` target with no
+`peteslang_core`/`Tests` split), delete it first — `rm -rf build` — so CMake isn't working from a stale cache
+of the old layout.
+
+Only a smoke test exists so far, proving the harness itself works end to end. Real lexer/parser/interpreter
+and `Examples/*.sl` regression suites are tracked in [`SPEC.md`](./SPEC.md)'s roadmap.
+
 ## Project structure
 
 ```
@@ -79,7 +105,9 @@ PeteSlang/
     SymbolTable.h/cpp    variable name -> SymbolInfo lookup
   main.cpp
 Examples/                sample .sl scripts
+Tests/                   GoogleTest suite (CMake FetchContent), run via CTest
 SLANG_FOR_DOT_NET_STEP7.pdf   source material / reference spec
+SPEC.md                  full specification, roadmap, and known-defects log
 ```
 
 AST ownership is `std::unique_ptr`-based throughout (child expressions/statements, statement-block vectors,
@@ -88,18 +116,11 @@ are scoped `enum class`es. See `CLAUDE.md` for the full architectural writeup.
 
 ## Roadmap
 
-PeteSlang is being developed in phases, moving from "toy interpreter" toward a real multi-backend compiler:
+The detailed roadmap, task list, and known-defects log live in [`SPEC.md`](./SPEC.md), which is the project's
+source of truth for scope and sequencing. In short: stabilize and test the current interpreter, refactor to a
+visitor-based AST, add user-defined functions (the ebook's STEP 7), then — as an optional stretch goal — a
+C++ code-generation backend (compiled via a configurable host compiler) and, further out, LLVM.
 
-1. **Modernize the base** *(done)* — `unique_ptr`-owned AST, `enum class` enums, `std::variant`-backed
-   `SymbolInfo`, and the current folder-per-concern layout (`AST/`, `Frontend/`, `Runtime/`).
-2. **Visitor pattern refactor** — replace the current per-node `evaluate()`/`typeCheck()` virtuals with a proper
-   `accept(Visitor&)` dispatch, so each future backend (interpreter, LLVM, C transpiler) is a self-contained
-   `Visitor` implementation instead of another method bolted onto every AST node.
-3. **STEP 7 — user-defined functions** — `FUNCTION`/`RETURN`, function-call expressions, a module-of-functions
-   program shape, and real call frames so recursion (Fibonacci, factorial) works.
-4. **LLVM backend** — an `LLVMCodegen` visitor that emits LLVM IR per AST node, with both a JIT mode and an
-   ahead-of-time mode (`.ll` → `llc` → native executable).
-5. **C-transpile / GCC backend** — a `CTranspiler` visitor that emits plain C source from the AST and hands it
-   to `gcc` to compile — a second, independent code-generation path alongside LLVM.
-6. **Polish** — a unified CLI (`--interpret` / `--emit-llvm` / `--emit-c`), a test harness running every
-   `Examples/*.sl` script through all three backends, and updated docs.
+## License
+
+MIT — see [`LICENSE`](./LICENSE).
